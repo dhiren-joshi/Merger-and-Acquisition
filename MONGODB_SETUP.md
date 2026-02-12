@@ -42,8 +42,13 @@ If you don't have MongoDB installed locally, use MongoDB Atlas:
 3. Get your connection string
 4. Update `backend\.env`:
    ```
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/mna_platform
+   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/<database-name>
    ```
+   Replace:
+   - `<username>` with your MongoDB Atlas username
+   - `<password>` with your MongoDB Atlas password
+   - `<cluster-url>` with your cluster URL
+   - `<database-name>` with `mna_platform`
 
 ## After Starting MongoDB
 
