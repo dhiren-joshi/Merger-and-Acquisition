@@ -1,0 +1,33 @@
+import dotenv from 'dotenv';
+import app from './app.js';
+import connectDB from './config/database.js';
+
+// Load environment variables
+dotenv.config();
+
+// Connect to MongoDB
+connectDB();
+
+// Get port from environment
+const PORT = process.env.PORT || 5000;
+
+// Start server
+const server = app.listen(PORT, () => {
+    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+    console.error('Unhandled Rejection:', err);
+    server.close(() => {
+        process.exit(1);
+    });
+});
+
+// Handle SIGTERM
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+        console.log('Process terminated');
+    });
+});
