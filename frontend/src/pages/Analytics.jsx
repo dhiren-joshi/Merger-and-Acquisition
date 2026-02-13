@@ -20,9 +20,51 @@ export default function Analytics() {
         try {
             setLoading(true);
             const response = await dealService.getPipelineAnalytics();
-            setAnalytics(response.data);
+
+            // Transform backend response to match frontend expectations
+            const data = response.data;
+
+            // Convert dealsByStage array to object
+            const dealsByStage = {};
+            data.dealsByStage?.forEach(stage => {
+                dealsByStage[stage._id] = stage.count;
+            });
+
+            // Convert distribution to fit score categories
+            const fitScoreDistribution = {};
+            data.distribution?.forEach(bucket => {
+                let category;
+                if (bucket._id === 0) category = 'Poor Fit';
+                else if (bucket._id === 20) category = 'Weak Fit';
+                else if (bucket._id === 40) category = 'Moderate Fit';
+                else if (bucket._id === 60) category = 'Good Fit';
+                else if (bucket._id === 80) category = 'Strong Fit';
+                else category = 'Other';
+
+                fitScoreDistribution[category] = bucket.count;
+            });
+
+            // Calculate total deals
+            const totalDeals = Object.values(dealsByStage).reduce((sum, count) => sum + count, 0);
+
+            setAnalytics({
+                totalDeals,
+                averageFitScore: data.avgFitScore || 0,
+                dealsByStage,
+                fitScoreDistribution,
+                dealTypeDistribution: data.dealTypeDistribution || []
+            });
         } catch (error) {
+            console.error('Analytics fetch error:', error);
             toast.error('Failed to fetch analytics');
+            // Set empty analytics on error
+            setAnalytics({
+                totalDeals: 0,
+                averageFitScore: 0,
+                dealsByStage: {},
+                fitScoreDistribution: {},
+                dealTypeDistribution: []
+            });
         } finally {
             setLoading(false);
         }

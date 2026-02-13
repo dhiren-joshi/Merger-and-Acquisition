@@ -1,4 +1,5 @@
 import Deal from '../models/Deal.js';
+import mongoose from 'mongoose';
 
 /**
  * Get pipeline analytics
@@ -6,9 +7,18 @@ import Deal from '../models/Deal.js';
  */
 export const getPipelineAnalytics = async (req, res) => {
     try {
+        console.log('Analytics request - User ID:', req.userId);
+
+        // Convert userId to ObjectId for MongoDB aggregate queries
+        const userId = new mongoose.Types.ObjectId(req.userId);
+
+        // Get total deals for this user (debug)
+        const totalDeals = await Deal.countDocuments({ createdBy: userId });
+        console.log('Total deals for user:', totalDeals);
+
         // Get deals by stage
         const dealsByStage = await Deal.aggregate([
-            { $match: { createdBy: req.userId } },
+            { $match: { createdBy: userId } },
             {
                 $group: {
                     _id: '$currentStage',
@@ -20,7 +30,7 @@ export const getPipelineAnalytics = async (req, res) => {
 
         // Get overall average fit score
         const avgFitScore = await Deal.aggregate([
-            { $match: { createdBy: req.userId } },
+            { $match: { createdBy: userId } },
             {
                 $group: {
                     _id: null,
@@ -31,7 +41,7 @@ export const getPipelineAnalytics = async (req, res) => {
 
         // Get fit score distribution
         const distribution = await Deal.aggregate([
-            { $match: { createdBy: req.userId } },
+            { $match: { createdBy: userId } },
             {
                 $bucket: {
                     groupBy: '$fitScore.adjustedFitScore',
@@ -44,7 +54,7 @@ export const getPipelineAnalytics = async (req, res) => {
 
         // Get deal type distribution
         const dealTypeDistribution = await Deal.aggregate([
-            { $match: { createdBy: req.userId } },
+            { $match: { createdBy: userId } },
             {
                 $group: {
                     _id: '$dealType',
