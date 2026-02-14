@@ -8,7 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+### Added (Latest - 2026-02-13)
+- **Deal Sharing System**
+  - ShareModal component for email-based deal sharing
+  - Permission management (View/Edit access levels)
+  - Share link generation and invitation system
+  - Access revocation capabilities
+  - Share history tracking
+  
+- **Activity Tracking**
+  - ActivityTimeline component for visual activity history
+  - User action tracking (created, updated, moved stages, shared)
+  - Timestamp display with relative time formatting
+  - Icon-based activity type identification
+  - Real-time activity updates
+
+- **Role-Based Access Control (RBAC)**
+  - Role authorization middleware (roleAuth.js)
+  - Multi-role support: MANAGER and ANALYST  
+  - Pre-configured middleware: requireManager, requireAnalyst, requireAnyRole
+  - Role-based route protection
+  - Authorization error handling
+
+### Added (Previous - 2026-02-12)
 - **Analytics Dashboard Page**
   - KPI cards showing total deals, average fit score, active deals, and high-fit deals
   - Interactive bar chart for deals by pipeline stage

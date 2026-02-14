@@ -15,6 +15,7 @@ A comprehensive web-based platform for managing Merger & Acquisition workflows w
 
 This project includes comprehensive documentation to help you understand the system:
 
+- **[PROGRESS_REPORT.md](PROGRESS_REPORT.md)**: Complete project progress report with all features and phases
 - **[DEVELOPMENT_LOG.md](DEVELOPMENT_LOG.md)**: Detailed log of all development activities, decisions, and changes
 - **[CHANGELOG.md](CHANGELOG.md)**: Version history and release notes
 - **[ARCHITECTURE.md](ARCHITECTURE.md)**: System architecture, design decisions, and component interactions
@@ -22,6 +23,7 @@ This project includes comprehensive documentation to help you understand the sys
 - **[MONGODB_SETUP.md](MONGODB_SETUP.md)**: Database configuration guide
 - **[QUICKSTART.md](QUICKSTART.md)**: Quick setup guide
 - **[.agent/workflows/documentation.md](.agent/workflows/documentation.md)**: How to maintain project documentation
+
 
 ## Tech Stack
 

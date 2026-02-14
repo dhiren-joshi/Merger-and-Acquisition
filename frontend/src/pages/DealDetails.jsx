@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ArrowLeft, Download, Share2, Edit } from 'lucide-react';
+import { ArrowLeft, Download, Share2, Edit, History } from 'lucide-react';
 import Header from '../components/common/Header';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import CircularGauge from '../components/visualizations/CircularGauge';
@@ -9,6 +9,8 @@ import MetricBarChart from '../components/visualizations/MetricBarChart';
 import WeightDistributionChart from '../components/visualizations/WeightDistributionChart';
 import InsightsCard from '../components/visualizations/InsightsCard';
 import NotesSection from '../components/collaboration/NotesSection';
+import ShareModal from '../components/sharing/ShareModal';
+import ActivityTimeline from '../components/activity/ActivityTimeline';
 import dealService from '../services/dealService';
 import { exportToPDF, exportToJSON } from '../services/exportService';
 import { exportToExcel } from '../services/excelExportService';
@@ -19,6 +21,8 @@ export default function DealDetails() {
     const navigate = useNavigate();
     const [deal, setDeal] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [shareModalOpen, setShareModalOpen] = useState(false);
+    const [showActivity, setShowActivity] = useState(false);
 
     useEffect(() => {
         fetchDeal();
@@ -37,11 +41,12 @@ export default function DealDetails() {
         }
     };
 
-    const handleExportPDF = () => {
+    const handleExportPDF = async () => {
         try {
-            exportToPDF(deal);
+            await exportToPDF(deal);
             toast.success('PDF exported successfully!');
         } catch (error) {
+            console.error('PDF export error:', error);
             toast.error('Failed to export PDF');
         }
     };
@@ -65,7 +70,7 @@ export default function DealDetails() {
     };
 
     const handleShare = () => {
-        toast.info('Share feature coming soon!');
+        setShareModalOpen(true);
     };
 
     if (loading) {
@@ -351,7 +356,31 @@ export default function DealDetails() {
                 <div className="mt-6">
                     <NotesSection deal={deal} onUpdate={fetchDeal} />
                 </div>
+
+                {/* Activity Timeline */}
+                <div className="mt-6 card">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                            <History className="w-5 h-5 mr-2" />
+                            Activity Timeline
+                        </h3>
+                        <button
+                            onClick={() => setShowActivity(!showActivity)}
+                            className="text-sm text-primary-600 hover:text-primary-700"
+                        >
+                            {showActivity ? 'Hide' : 'Show'}
+                        </button>
+                    </div>
+                    {showActivity && <ActivityTimeline dealId={dealId} />}
+                </div>
             </main>
+
+            {/* Share Modal */}
+            <ShareModal
+                deal={deal}
+                isOpen={shareModalOpen}
+                onClose={() => setShareModalOpen(false)}
+            />
         </div>
     );
 }

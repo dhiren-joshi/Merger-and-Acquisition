@@ -147,7 +147,12 @@ export default function KanbanBoard({ onCreateDealClick }) {
                                                 }`}
                                         >
                                             {stageDeals.map((deal, index) => (
-                                                <DealCard key={deal._id} deal={deal} index={index} />
+                                                <DealCard
+                                                    key={deal._id}
+                                                    deal={deal}
+                                                    index={index}
+                                                    onUpdate={fetchDeals}
+                                                />
                                             ))}
                                             {provided.placeholder}
 

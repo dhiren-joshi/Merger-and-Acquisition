@@ -8,7 +8,7 @@ export default function CircularGauge({ score, size = 200 }) {
     const category = getFitScoreCategory(normalizedScore);
 
     return (
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center" data-testid="circular-gauge">
             <div className="relative" style={{ width: size, height: size }}>
                 <svg
                     className="transform -rotate-90"

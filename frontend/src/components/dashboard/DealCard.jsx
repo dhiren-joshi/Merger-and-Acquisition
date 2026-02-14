@@ -3,8 +3,10 @@ import { formatCurrency, formatRelativeTime } from '../../utils/formatters';
 import { Draggable } from '@hello-pangea/dnd';
 import { TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AssignmentDropdown from './AssignmentDropdown';
+import AssignmentStatusBadge from './AssignmentStatusBadge';
 
-export default function DealCard({ deal, index }) {
+export default function DealCard({ deal, index, onUpdate }) {
     const navigate = useNavigate();
     const fitScore = deal.fitScore?.adjustedFitScore || 0;
     const color = getFitScoreColor(fitScore);
@@ -25,16 +27,24 @@ export default function DealCard({ deal, index }) {
                     className={`bg-white rounded-lg shadow-md p-4 mb-3 cursor-pointer hover:shadow-lg transition-all ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-primary-400' : ''
                         }`}
                 >
-                    {/* Company Name */}
-                    <h3 className="font-semibold text-gray-900 mb-2 text-lg">
-                        {deal.targetCompanyName}
-                    </h3>
+                    {/* Header: Company Name & Assignment Dropdown */}
+                    <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-gray-900 text-lg flex-1">
+                            {deal.targetCompanyName}
+                        </h3>
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <AssignmentDropdown deal={deal} onAssign={onUpdate} />
+                        </div>
+                    </div>
 
-                    {/* Deal Type Badge */}
-                    <div className="mb-3">
+                    {/* Deal Type Badge & Assignment Status */}
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
                         <span className="inline-block px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded">
                             {deal.dealType}
                         </span>
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <AssignmentStatusBadge deal={deal} onUpdate={onUpdate} />
+                        </div>
                     </div>
 
                     {/* Fit Score */}
@@ -79,16 +89,6 @@ export default function DealCard({ deal, index }) {
                             <p className="text-sm text-gray-600">
                                 Value: <span className="font-semibold">{formatCurrency(deal.dealValue)}</span>
                             </p>
-                        </div>
-                    )}
-
-                    {/* Assigned To */}
-                    {deal.assignedTo && (
-                        <div className="flex items-center text-xs text-gray-500 mb-2">
-                            <div className="w-6 h-6 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs mr-2">
-                                {deal.assignedTo.firstName[0]}{deal.assignedTo.lastName[0]}
-                            </div>
-                            <span>{deal.assignedTo.firstName} {deal.assignedTo.lastName}</span>
                         </div>
                     )}
 

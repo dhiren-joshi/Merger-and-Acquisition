@@ -1,210 +1,326 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 import { formatCurrency, formatDate, formatPercentage } from '../utils/formatters';
 import { getFitScoreCategory } from '../utils/constants';
 
-export const exportToPDF = (deal) => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    let yPos = 20;
+/**
+ * Enhanced PDF Export with Visual Charts
+ */
+export const exportToPDF = async (deal) => {
+    try {
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+        let yPos = margin;
 
-    // Helper function to add spacing
-    const addSpace = (space = 10) => {
-        yPos += space;
-        if (yPos > pageHeight - 30) {
-            doc.addPage();
-            yPos = 20;
-        }
-    };
+        // Helper function to check and handle page breaks
+        const checkPageBreak = (requiredSpace) => {
+            if (yPos + requiredSpace > pageHeight - margin) {
+                doc.addPage();
+                yPos = margin;
+                return true;
+            }
+            return false;
+        };
 
-    // Header
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('M&A Fit Score Analysis', pageWidth / 2, yPos, { align: 'center' });
-    addSpace(15);
+        // ===== PAGE 1: HEADER AND SUMMARY =====
 
-    // Company Name and Deal Type
-    doc.setFontSize(16);
-    doc.text(deal.targetCompanyName, pageWidth / 2, yPos, { align: 'center' });
-    addSpace(8);
+        // Title
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(31, 41, 55); // gray-900
+        doc.text('M&A Fit Score Analysis', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 12;
 
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Deal: ${deal.dealName} | Type: ${deal.dealType}`, pageWidth / 2, yPos, { align: 'center' });
-    addSpace(15);
+        // Company Name
+        doc.setFontSize(18);
+        doc.setTextColor(79, 70, 229); // primary-600
+        doc.text(deal.targetCompanyName, pageWidth / 2, yPos, { align: 'center' });
+        yPos += 10;
 
-    // Fit Score Box
-    const fitScore = Math.round(deal.fitScore?.adjustedFitScore || 0);
-    const category = getFitScoreCategory(fitScore);
+        // Deal Info
+        doc.setFontSize(11);
+        doc.setTextColor(107, 114, 128); // gray-500
+        doc.text(`${deal.dealName} • ${deal.dealType}`, pageWidth / 2, yPos, { align: 'center' });
+        yPos += 12;
 
-    doc.setFillColor(240, 240, 240);
-    doc.rect(20, yPos, pageWidth - 40, 30, 'F');
+        // Separator
+        doc.setDrawColor(229, 231, 235);
+        doc.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 10;
 
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Fit Score:', 30, yPos + 12);
-    doc.text(`${fitScore}/100`, 80, yPos + 12);
+        // Fit Score Display Box
+        const fitScore = Math.round(deal.fitScore?.adjustedFitScore || 0);
+        const category = getFitScoreCategory(fitScore);
 
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'normal');
-    doc.text(category, 30, yPos + 24);
-    addSpace(40);
+        // Score color based on value
+        let scoreColor = [220, 38, 38]; // red
+        if (fitScore >= 81) scoreColor = [34, 197, 94]; // green
+        else if (fitScore >= 61) scoreColor = [59, 130, 246]; // blue
+        else if (fitScore >= 41) scoreColor = [251, 146, 60]; // orange
 
-    // Deal Information Section
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Deal Information', 20, yPos);
-    addSpace(8);
+        doc.setFillColor(249, 250, 251); // gray-50
+        doc.roundedRect(margin, yPos, pageWidth - (margin * 2), 35, 3, 3, 'F');
 
-    const dealInfo = [
-        ['Deal Value', deal.dealValue ? formatCurrency(deal.dealValue) : 'N/A'],
-        ['Current Stage', deal.currentStage || 'N/A'],
-        ['Status', deal.status || 'N/A'],
-        ['Created', formatDate(deal.createdAt)],
-        ['Last Updated', formatDate(deal.updatedAt)]
-    ];
+        doc.setFontSize(14);
+        doc.setTextColor(75, 85, 99); // gray-600
+        doc.text('Overall Fit Score', pageWidth / 2, yPos + 10, { align: 'center' });
 
-    doc.autoTable({
-        startY: yPos,
-        head: [],
-        body: dealInfo,
-        theme: 'plain',
-        columnStyles: {
-            0: { fontStyle: 'bold', cellWidth: 50 },
-            1: { cellWidth: 'auto' }
-        },
-        margin: { left: 20 }
-    });
+        doc.setFontSize(32);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...scoreColor);
+        doc.text(`${fitScore}`, pageWidth / 2, yPos + 25, { align: 'center' });
 
-    yPos = doc.lastAutoTable.finalY + 15;
+        doc.setFontSize(12);
+        doc.setTextColor(107, 114, 128);
+        doc.setFont('helvetica', 'normal');
+        doc.text(category, pageWidth / 2, yPos + 31, { align: 'center' });
+        yPos += 45;
 
-    // Metric Breakdown
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Metric Breakdown', 20, yPos);
-    addSpace(8);
+        // ===== DEAL INFORMATION TABLE =====
+        checkPageBreak(40);
 
-    if (deal.fitScore?.metricBreakdown) {
-        const metrics = deal.fitScore.metricBreakdown;
-        const metricData = [
-            ['Metric', 'Raw Score', 'Weight', 'Weighted Score'],
-            [
-                'Industry Match',
-                formatPercentage((metrics.industryMatch?.input || 0) * 100),
-                formatPercentage((metrics.industryMatch?.weight || 0) * 100),
-                formatPercentage((metrics.industryMatch?.weightedScore || 0) * 100)
-            ],
-            [
-                'Financials',
-                formatPercentage((metrics.financials?.input || 0) * 100),
-                formatPercentage((metrics.financials?.weight || 0) * 100),
-                formatPercentage((metrics.financials?.weightedScore || 0) * 100)
-            ],
-            [
-                'Cultural Fit',
-                formatPercentage((metrics.cultural?.input || 0) * 100),
-                formatPercentage((metrics.cultural?.weight || 0) * 100),
-                formatPercentage((metrics.cultural?.weightedScore || 0) * 100)
-            ],
-            [
-                'Technology',
-                formatPercentage((metrics.technology?.input || 0) * 100),
-                formatPercentage((metrics.technology?.weight || 0) * 100),
-                formatPercentage((metrics.technology?.weightedScore || 0) * 100)
-            ]
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(31, 41, 55);
+        doc.text('Deal Information', margin, yPos);
+        yPos += 8;
+
+        const dealInfo = [
+            ['Deal Value', deal.dealValue ? formatCurrency(deal.dealValue) : 'N/A'],
+            ['Current Stage', deal.currentStage || 'N/A'],
+            ['Deal Type', deal.dealType || 'N/A'],
+            ['Created', formatDate(deal.createdAt)],
+            ['Last Updated', formatDate(deal.updatedAt)]
         ];
 
         doc.autoTable({
             startY: yPos,
-            head: [metricData[0]],
-            body: metricData.slice(1),
-            theme: 'striped',
-            headStyles: { fillColor: [59, 130, 246] },
-            margin: { left: 20, right: 20 }
+            body: dealInfo,
+            theme: 'plain',
+            columnStyles: {
+                0: { fontStyle: 'bold', cellWidth: 50, textColor: [75, 85, 99] },
+                1: { cellWidth: 'auto', textColor: [31, 41, 55] }
+            },
+            margin: { left: margin, right: margin },
+            styles: { fontSize: 10 }
         });
 
         yPos = doc.lastAutoTable.finalY + 15;
-    }
 
-    // Check if we need a new page
-    if (yPos > pageHeight - 80) {
-        doc.addPage();
-        yPos = 20;
-    }
+        // ===== METRIC BREAKDOWN TABLE =====
+        checkPageBreak(50);
 
-    // Strengths Section
-    if (deal.fitScore?.strengths && deal.fitScore.strengths.length > 0) {
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text('Strengths', 20, yPos);
-        addSpace(8);
+        doc.setTextColor(31, 41, 55);
+        doc.text('Metric Breakdown', margin, yPos);
+        yPos += 8;
 
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        deal.fitScore.strengths.forEach((strength, index) => {
-            const lines = doc.splitTextToSize(`• ${strength}`, pageWidth - 50);
-            doc.text(lines, 25, yPos);
-            yPos += lines.length * 5 + 2;
-        });
-        addSpace(10);
-    }
+        if (deal.fitScore?.metricBreakdown) {
+            const metrics = deal.fitScore.metricBreakdown;
 
-    // Risks Section
-    if (deal.fitScore?.risks && deal.fitScore.risks.length > 0) {
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Risks', 20, yPos);
-        addSpace(8);
+            // Updated metric names to match current schema
+            const metricData = [
+                ['Metric', 'Raw Score', 'Weight', 'Weighted Score'],
+                [
+                    'Industry Match',
+                    Math.round((metrics.industryMatch?.input || 0) * 100),
+                    `${Math.round((metrics.industryMatch?.weight || 0) * 100)}%`,
+                    Math.round(metrics.industryMatch?.weightedScore || 0)
+                ],
+                [
+                    'Financial Health',
+                    Math.round((metrics.financialHealth?.input || 0) * 100),
+                    `${Math.round((metrics.financialHealth?.weight || 0) * 100)}%`,
+                    Math.round(metrics.financialHealth?.weightedScore || 0)
+                ],
+                [
+                    'Cultural Fit',
+                    Math.round((metrics.culturalFit?.input || 0) * 100),
+                    `${Math.round((metrics.culturalFit?.weight || 0) * 100)}%`,
+                    Math.round(metrics.culturalFit?.weightedScore || 0)
+                ],
+                [
+                    'Technology Compatibility',
+                    Math.round((metrics.technologyCompatibility?.input || 0) * 100),
+                    `${Math.round((metrics.technologyCompatibility?.weight || 0) * 100)}%`,
+                    Math.round(metrics.technologyCompatibility?.weightedScore || 0)
+                ],
+                [
+                    'Strategic Alignment',
+                    Math.round((metrics.strategicAlignment?.input || 0) * 100),
+                    `${Math.round((metrics.strategicAlignment?.weight || 0) * 100)}%`,
+                    Math.round(metrics.strategicAlignment?.weightedScore || 0)
+                ]
+            ];
 
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        deal.fitScore.risks.forEach((risk, index) => {
-            const lines = doc.splitTextToSize(`• ${risk}`, pageWidth - 50);
-            doc.text(lines, 25, yPos);
-            yPos += lines.length * 5 + 2;
-        });
-        addSpace(10);
-    }
+            doc.autoTable({
+                startY: yPos,
+                head: [metricData[0]],
+                body: metricData.slice(1),
+                theme: 'striped',
+                headStyles: {
+                    fillColor: [79, 70, 229], // primary-600
+                    textColor: [255, 255, 255],
+                    fontSize: 10,
+                    fontStyle: 'bold'
+                },
+                bodyStyles: { fontSize: 9 },
+                alternateRowStyles: { fillColor: [249, 250, 251] },
+                margin: { left: margin, right: margin }
+            });
 
-    // Recommendations Section
-    if (deal.fitScore?.recommendations && deal.fitScore.recommendations.length > 0) {
-        // Check if we need a new page
-        if (yPos > pageHeight - 60) {
-            doc.addPage();
-            yPos = 20;
+            yPos = doc.lastAutoTable.finalY + 15;
         }
 
+        // ===== VISUAL CHARTS (if available) =====
+        try {
+            // Capture Circular Gauge
+            const gaugeElement = document.querySelector('[data-testid="circular-gauge"]') ||
+                document.querySelector('.circular-gauge');
+
+            if (gaugeElement) {
+                checkPageBreak(80);
+
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(31, 41, 55);
+                doc.text('Visual Score Representation', margin, yPos);
+                yPos += 8;
+
+                const canvas = await html2canvas(gaugeElement, {
+                    scale: 2,
+                    backgroundColor: '#ffffff'
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 60;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                doc.addImage(imgData, 'PNG', (pageWidth - imgWidth) / 2, yPos, imgWidth, imgHeight);
+                yPos += imgHeight + 10;
+            }
+        } catch (error) {
+            console.warn('Could not capture gauge chart:', error);
+        }
+
+        // ===== KEY INSIGHTS =====
+        checkPageBreak(20);
+
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text('Recommendations', 20, yPos);
-        addSpace(8);
+        doc.setTextColor(31, 41, 55);
+        doc.text('Key Insights', margin, yPos);
+        yPos += 10;
 
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        deal.fitScore.recommendations.forEach((rec, index) => {
-            const lines = doc.splitTextToSize(`${index + 1}. ${rec}`, pageWidth - 50);
-            doc.text(lines, 25, yPos);
-            yPos += lines.length * 5 + 2;
-        });
+        // Strengths
+        if (deal.fitScore?.strengths && deal.fitScore.strengths.length > 0) {
+            checkPageBreak(20);
+
+            doc.setFontSize(12);
+            doc.setTextColor(22, 163, 74); // green-600
+            doc.text('✓ Strengths', margin, yPos);
+            yPos += 6;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(55, 65, 81); // gray-700
+
+            deal.fitScore.strengths.forEach((strength, index) => {
+                checkPageBreak(10);
+                const lines = doc.splitTextToSize(`• ${strength}`, pageWidth - (margin * 2) - 5);
+                doc.text(lines, margin + 3, yPos);
+                yPos += lines.length * 4 + 2;
+            });
+            yPos += 5;
+        }
+
+        // Risks
+        if (deal.fitScore?.risks && deal.fitScore.risks.length > 0) {
+            checkPageBreak(20);
+
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(220, 38, 38); // red-600
+            doc.text('⚠ Risks', margin, yPos);
+            yPos += 6;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(55, 65, 81);
+
+            deal.fitScore.risks.forEach((risk, index) => {
+                checkPageBreak(10);
+                const lines = doc.splitTextToSize(`• ${risk}`, pageWidth - (margin * 2) - 5);
+                doc.text(lines, margin + 3, yPos);
+                yPos += lines.length * 4 + 2;
+            });
+            yPos += 5;
+        }
+
+        // Recommendations
+        if (deal.fitScore?.recommendations && deal.fitScore.recommendations.length > 0) {
+            checkPageBreak(20);
+
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(79, 70, 229); // primary-600
+            doc.text('→ Recommendations', margin, yPos);
+            yPos += 6;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(55, 65, 81);
+
+            deal.fitScore.recommendations.forEach((rec, index) => {
+                checkPageBreak(10);
+                const lines = doc.splitTextToSize(`${index + 1}. ${rec}`, pageWidth - (margin * 2) - 5);
+                doc.text(lines, margin + 3, yPos);
+                yPos += lines.length * 4 + 2;
+            });
+        }
+
+        // ===== FOOTER ON EVERY PAGE =====
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(156, 163, 175); // gray-400
+
+            doc.text(
+                `Generated on ${formatDate(new Date())}`,
+                margin,
+                pageHeight - 10
+            );
+
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                pageWidth / 2,
+                pageHeight - 10,
+                { align: 'center' }
+            );
+
+            doc.text(
+                'M&A Platform',
+                pageWidth - margin,
+                pageHeight - 10,
+                { align: 'right' }
+            );
+        }
+
+        // Save the PDF
+        const fileName = `${deal.targetCompanyName.replace(/\s+/g, '_')}_FitScore_${new Date().getTime()}.pdf`;
+        doc.save(fileName);
+
+        return true;
+    } catch (error) {
+        console.error('PDF export error:', error);
+        throw error;
     }
-
-    // Footer on every page
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        doc.text(
-            `Generated on ${formatDate(new Date())} | Page ${i} of ${pageCount}`,
-            pageWidth / 2,
-            pageHeight - 10,
-            { align: 'center' }
-        );
-    }
-
-    // Save the PDF
-    doc.save(`${deal.dealName.replace(/\s+/g, '_')}_FitScore_Analysis.pdf`);
 };
 
 export const exportToJSON = (deal) => {

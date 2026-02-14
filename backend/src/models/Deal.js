@@ -9,7 +9,8 @@ import {
     TALENT_RETENTION_RISK,
     INFRASTRUCTURE_TYPES,
     DEV_METHODOLOGIES,
-    STRATEGIC_MOTIVES
+    STRATEGIC_MOTIVES,
+    ASSIGNMENT_STATUS
 } from '../utils/constants.js';
 
 const dealSchema = new mongoose.Schema({
@@ -37,10 +38,25 @@ const dealSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+
+    // Assignment Fields (Phase 2)
     assignedTo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    assignedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    assignedAt: {
+        type: Date
+    },
+    assignmentStatus: {
+        type: String,
+        enum: Object.values(ASSIGNMENT_STATUS),
+        default: null  // null when unassigned
+    },
+
     expectedCloseDate: {
         type: Date
     },
@@ -205,6 +221,7 @@ const dealSchema = new mongoose.Schema({
 
 // Indexes for performance
 dealSchema.index({ createdBy: 1 });
+dealSchema.index({ assignedTo: 1 }); // For filtering deals by assigned analyst
 dealSchema.index({ currentStage: 1 });
 dealSchema.index({ dealType: 1 });
 dealSchema.index({ 'fitScore.adjustedFitScore': 1 });

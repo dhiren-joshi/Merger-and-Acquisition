@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Download } from 'lucide-react';
 import Header from '../components/common/Header';
 import Sidebar from '../components/common/Sidebar';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ComparisonRadarChart from '../components/comparison/ComparisonRadarChart';
 import ComparisonTable from '../components/comparison/ComparisonTable';
 import dealService from '../services/dealService';
+import { exportComparisonToPDF, exportComparisonWithCharts } from '../services/comparisonExportService';
 
 export default function DealComparison() {
     const navigate = useNavigate();
     const [allDeals, setAllDeals] = useState([]);
     const [selectedDeals, setSelectedDeals] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
         fetchDeals();
@@ -47,6 +49,32 @@ export default function DealComparison() {
         setSelectedDeals(selectedDeals.filter(d => d._id !== dealId));
     };
 
+    const handleExportPDF = async () => {
+        try {
+            setExporting(true);
+            await exportComparisonToPDF(selectedDeals);
+            toast.success('PDF exported successfully!');
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error('Failed to export PDF');
+        } finally {
+            setExporting(false);
+        }
+    };
+
+    const handleExportWithCharts = async () => {
+        try {
+            setExporting(true);
+            await exportComparisonWithCharts(selectedDeals);
+            toast.success('PDF with charts exported successfully!');
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error('Failed to export PDF with charts');
+        } finally {
+            setExporting(false);
+        }
+    };
+
     const availableDeals = allDeals.filter(
         deal => !selectedDeals.find(d => d._id === deal._id)
     );
@@ -73,11 +101,34 @@ export default function DealComparison() {
                 <Sidebar />
 
                 <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="mb-6">
-                        <h1 className="text-3xl font-bold text-gray-900">Deal Comparison</h1>
-                        <p className="text-gray-600 mt-2">
-                            Compare multiple deals side-by-side to identify the best opportunities
-                        </p>
+                    <div className="mb-6 flex items-center justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">Deal Comparison</h1>
+                            <p className="text-gray-600 mt-2">
+                                Compare multiple deals side-by-side to identify the best opportunities
+                            </p>
+                        </div>
+
+                        {selectedDeals.length >= 2 && (
+                            <div className="flex space-x-3">
+                                <button
+                                    onClick={handleExportPDF}
+                                    disabled={exporting}
+                                    className="btn-secondary flex items-center space-x-2"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    <span>{exporting ? 'Exporting...' : 'Export PDF'}</span>
+                                </button>
+                                <button
+                                    onClick={handleExportWithCharts}
+                                    disabled={exporting}
+                                    className="btn-primary flex items-center space-x-2"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    <span>{exporting ? 'Exporting...' : 'PDF with Charts'}</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Deal Selection */}
@@ -150,7 +201,7 @@ export default function DealComparison() {
                     ) : (
                         <>
                             {/* Radar Chart Comparison */}
-                            <div className="card mb-6">
+                            <div className="card mb-6" data-chart="radar">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
                                     Metric Comparison (Radar Chart)
                                 </h2>
@@ -158,7 +209,7 @@ export default function DealComparison() {
                             </div>
 
                             {/* Detailed Table Comparison */}
-                            <div className="card">
+                            <div className="card" data-table="comparison">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
                                     Detailed Comparison
                                 </h2>

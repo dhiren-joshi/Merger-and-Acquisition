@@ -13,7 +13,8 @@ export default function Register() {
         confirmPassword: '',
         firstName: '',
         lastName: '',
-        company: ''
+        company: '',
+        role: '' // Manager or Analyst
     });
     const [loading, setLoading] = useState(false);
 
@@ -113,6 +114,25 @@ export default function Register() {
                                 value={formData.company}
                                 onChange={handleChange}
                             />
+                        </div>
+
+                        <div>
+                            <label htmlFor="role" className="label">Role *</label>
+                            <select
+                                id="role"
+                                name="role"
+                                required
+                                className="input"
+                                value={formData.role}
+                                onChange={handleChange}
+                            >
+                                <option value="">Select your role</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Analyst">Analyst</option>
+                            </select>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Managers can assign deals and view all data. Analysts work on assigned deals.
+                            </p>
                         </div>
 
                         <div>

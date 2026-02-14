@@ -9,6 +9,10 @@ import { errorHandler, notFound } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.js';
 import dealRoutes from './routes/deals.js';
 import analyticsRoutes from './routes/analytics.js';
+import usersRoutes from './routes/users.js';
+import sharingRoutes from './routes/sharing.js';
+import activityRoutes from './routes/activity.js';
+import notificationRoutes from './routes/notifications.js';
 
 const app = express();
 
@@ -45,6 +49,10 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/deals', dealRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/sharing', sharingRoutes);
+app.use('/api/activity', activityRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // 404 handler
 app.use(notFound);

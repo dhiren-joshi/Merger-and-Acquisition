@@ -5,6 +5,129 @@
 
 ---
 
+## 2026-02-13 - Collaboration & Security Enhancements
+
+### Timestamp: 21:00 IST
+
+#### Context
+To support team-based M&A workflows, collaboration features were essential. Additionally, role-based access control was needed to ensure data security and appropriate permissions for different user types (Managers vs. Analysts).
+
+#### Actions Taken
+
+##### 1. Deal Sharing System
+- **ShareModal Component** ([ShareModal.jsx](file:///c:/Users/dhire/M&A/frontend/src/components/sharing/ShareModal.jsx))
+  - Email-based deal sharing functionality
+  - Permission management (View/Edit access levels)
+  - Share link generation
+  - User invitation system
+  - Access revocation capabilities
+  - Share history tracking
+
+##### 2. Activity Tracking System
+- **ActivityTimeline Component** ([ActivityTimeline.jsx](file:///c:/Users/dhire/M&A/frontend/src/components/activity/ActivityTimeline.jsx))
+  - Visual timeline of all deal activities
+  - User action tracking (created, updated, moved stages, shared)
+  - Timestamp display with relative time formatting
+  - User attribution for each activity
+  - Icon-based activity type identification
+  - Real-time activity updates
+
+##### 3. Role-Based Access Control (RBAC)
+- **Role Authorization Middleware** ([roleAuth.js](file:///c:/Users/dhire/M&A/backend/src/middleware/roleAuth.js))
+  - Role verification middleware
+  - Support for multiple user roles:
+    - `MANAGER`: Full access to all features
+    - `ANALYST`: Standard access to deals and analytics
+  - Flexible role checking with `requireRole()` function
+  - Pre-configured middleware: `requireManager`, `requireAnalyst`, `requireAnyRole`
+  - Proper error messages for unauthorized access
+
+#### Technical Details
+
+**Files Created/Modified**:
+- `frontend/src/components/sharing/ShareModal.jsx` (9.6 KB)
+- `frontend/src/components/activity/ActivityTimeline.jsx` (5.2 KB)
+- `backend/src/middleware/roleAuth.js` (1.5 KB)
+- `backend/src/utils/constants.js` (added USER_ROLES constants)
+
+**ShareModal Features**:
+```javascript
+// Share deal with email and permissions
+{
+  email: "analyst@company.com",
+  permission: "edit", // or "view"
+  dealId: "...",
+  message: "Optional invitation message"
+}
+```
+
+**Activity Tracking Events**:
+- Deal created
+- Deal updated (any field change)
+- Stage transitioned (Kanban drag-drop)
+- Deal shared with team member
+- Notes added
+- Attachments uploaded
+- Fit score recalculated
+
+**RBAC Implementation**:
+```javascript
+// Protect routes by role
+router.post('/admin/settings', auth, requireManager, settingsController);
+router.get('/deals', auth, requireAnyRole, dealsController);
+router.post('/deals', auth, requireAnalyst, createDealController);
+```
+
+#### Rationale
+
+**Why Sharing?**
+- M&A decisions are team-based, requiring multiple stakeholders
+- Enables cross-functional collaboration (finance, legal, operations)
+- Audit trail showing who has access to sensitive deal information
+- Reduces email attachments and version control issues
+
+**Why Activity Timeline?**
+- Provides complete audit trail for compliance
+- Helps teams understand deal progression
+- Identifies bottlenecks in pipeline (e.g., deals stuck in one stage)
+- Enables accountability for deal ownership
+
+**Why RBAC?**
+- Protects sensitive M&A data from unauthorized access
+- Ensures analysts can't perform administrative actions
+- Scalable permission system for future role expansion
+- Industry standard security practice for enterprise applications
+
+#### Outcome
+
+✅ **Successfully Implemented**:
+- Complete deal sharing workflow with email invitations
+- Real-time activity tracking across all deal interactions
+- Role-based security protecting sensitive operations
+- Integration with existing authentication system
+
+**Security Improvements**:
+- Authorization checks on all protected routes
+- User role validation before resource access
+- Clear error messages for debugging permission issues
+
+**User Experience Improvements**:
+- Seamless collaboration without leaving the platform
+- Visual activity history for transparency
+- Clear permission indicators throughout UI
+
+#### Next Steps
+
+Potential enhancements:
+- Real-time notifications for deal updates (WebSocket/Pusher)
+- More granular permissions (custom role creation)
+- Activity filtering and search
+- Export activity logs for compliance reporting
+- Bulk sharing for multiple deals
+
+---
+
+
 ## 2026-02-12 - UI Enhancements and Feature Expansion
 
 ### Timestamp: 22:30 IST

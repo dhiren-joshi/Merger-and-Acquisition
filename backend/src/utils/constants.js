@@ -59,12 +59,18 @@ export const FIT_SCORE_CATEGORIES = {
     POOR: { min: 0, max: 20, label: 'Poor Fit', description: 'Not Recommended - Consider alternatives' }
 };
 
-// User Roles
+// User Roles (Manager and Analyst only)
 export const USER_ROLES = {
-    ADMIN: 'Admin',
-    TEAM_LEAD: 'Team Lead',
-    ANALYST: 'Analyst',
-    VIEWER: 'Viewer'
+    MANAGER: 'Manager',
+    ANALYST: 'Analyst'
+};
+
+// Assignment Status (for Phase 2)
+export const ASSIGNMENT_STATUS = {
+    PENDING: 'Pending',
+    IN_PROGRESS: 'In Progress',
+    COMPLETED: 'Completed',
+    REASSIGNED: 'Reassigned'
 };
 
 // Cash Flow Status Options

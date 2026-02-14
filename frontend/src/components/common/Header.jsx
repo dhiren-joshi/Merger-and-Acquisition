@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, TrendingUp, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import authService from '../../services/authService';
+import NotificationBell from '../notifications/NotificationBell';
 
 export default function Header() {
     const navigate = useNavigate();
@@ -39,6 +40,9 @@ export default function Header() {
 
                     {/* User Menu */}
                     <div className="hidden md:flex items-center space-x-4">
+                        {/* Notification Bell */}
+                        <NotificationBell />
+
                         {user && (
                             <div className="flex items-center space-x-3">
                                 <div className="text-right">

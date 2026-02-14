@@ -1,17 +1,27 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, BarChart3, GitCompare, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, BarChart3, GitCompare, ChevronLeft, ChevronRight, ClipboardList } from 'lucide-react';
+import authService from '../../services/authService';
 
 export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
+    const isManager = authService.isManager();
+    const isAnalyst = authService.isAnalyst();
 
-    const menuItems = [
-        { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-        { path: '/fit-score', icon: TrendingUp, label: 'Fit Score Generator' },
-        { path: '/analytics', icon: BarChart3, label: 'Analytics' },
-        { path: '/comparison', icon: GitCompare, label: 'Compare Deals' },
+    const allMenuItems = [
+        { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['Manager'] },
+        { path: '/analyst-dashboard', icon: ClipboardList, label: 'My Assignments', roles: ['Analyst'] },
+        { path: '/fit-score', icon: TrendingUp, label: 'Fit Score Generator', roles: ['Manager'] },
+        { path: '/analytics', icon: BarChart3, label: 'Analytics', roles: ['Manager', 'Analyst'] },
+        { path: '/comparison', icon: GitCompare, label: 'Compare Deals', roles: ['Manager', 'Analyst'] },
     ];
+
+    // Filter menu items based on user role
+    const menuItems = allMenuItems.filter(item => {
+        const userRole = authService.getUserRole();
+        return !item.roles || item.roles.includes(userRole);
+    });
 
     const isActive = (path) => location.pathname === path;
 

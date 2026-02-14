@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import AnalystDashboard from './pages/AnalystDashboard';
 import FitScoreGenerator from './pages/FitScoreGenerator';
 import Analytics from './pages/Analytics';
 import DealDetails from './pages/DealDetails';
@@ -26,6 +27,14 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Dashboard />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/analyst-dashboard"
+                        element={
+                            <PrivateRoute>
+                                <AnalystDashboard />
                             </PrivateRoute>
                         }
                     />

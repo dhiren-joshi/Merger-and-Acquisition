@@ -2,12 +2,19 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 /**
- * Generate JWT token
+ * Generate JWT token with user ID and role
  */
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE || '24h'
-    });
+const generateToken = (user) => {
+    return jwt.sign(
+        {
+            id: user._id,
+            role: user.role
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: process.env.JWT_EXPIRE || '24h'
+        }
+    );
 };
 
 /**
@@ -16,7 +23,7 @@ const generateToken = (id) => {
  */
 export const register = async (req, res) => {
     try {
-        const { email, password, firstName, lastName, company } = req.body;
+        const { email, password, firstName, lastName, company, role } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -27,17 +34,26 @@ export const register = async (req, res) => {
             });
         }
 
+        // Validate role if provided
+        if (role && !['Manager', 'Analyst'].includes(role)) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid role. Must be either Manager or Analyst'
+            });
+        }
+
         // Create user
         const user = await User.create({
             email,
             password,
             firstName,
             lastName,
-            company
+            company,
+            role: role || 'Analyst' // Default to Analyst if not provided
         });
 
-        // Generate token
-        const token = generateToken(user._id);
+        // Generate token with user object
+        const token = generateToken(user);
 
         res.status(201).json({
             status: 'success',
@@ -99,8 +115,8 @@ export const login = async (req, res) => {
             });
         }
 
-        // Generate token
-        const token = generateToken(user._id);
+        // Generate token with user object
+        const token = generateToken(user);
 
         res.status(200).json({
             status: 'success',

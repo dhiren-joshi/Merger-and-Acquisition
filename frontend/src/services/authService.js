@@ -53,6 +53,28 @@ const authService = {
     },
 
     /**
+     * Get current user's role
+     */
+    getUserRole: () => {
+        const user = authService.getCurrentUser();
+        return user?.role || null;
+    },
+
+    /**
+     * Check if current user is a Manager
+     */
+    isManager: () => {
+        return authService.getUserRole() === 'Manager';
+    },
+
+    /**
+     * Check if current user is an Analyst
+     */
+    isAnalyst: () => {
+        return authService.getUserRole() === 'Analyst';
+    },
+
+    /**
      * Check if user is authenticated
      */
     isAuthenticated: () => {
