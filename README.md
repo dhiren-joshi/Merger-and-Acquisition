@@ -111,24 +111,32 @@ mongod
 "C:\Program Files\MongoDB\Server\[version]\bin\mongod.exe"
 ```
 
-**Start the backend server**:
+### 3. Run the Application
+
+You can now start the application using the provided utility scripts:
+
+**Option A: Using Scripts (Recommended)**
+1. Double-click `run_backend.bat` to start the API server
+2. Double-click `run_frontend.bat` to start the frontend
+
+**Option B: Manual Startup**
+
+**Start the Backend**:
 ```bash
+# In the backend directory
 npm run dev
 ```
 
-The backend will run on `http://localhost:5000`
-
-### 3. Frontend Setup
-
-Open a new terminal:
-
+**Start the Frontend**:
 ```bash
-cd frontend
+# In the frontend directory
 npm install
 npm run dev
 ```
 
-The frontend will run on `http://localhost:5173`
+The application will be available at:
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:5000
 
 ## Usage
 

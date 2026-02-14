@@ -1,9 +1,9 @@
-const Notification = require('../models/Notification');
+import Notification from '../models/Notification.js';
 
 /**
  * Get user's notifications with pagination
  */
-exports.getNotifications = async (req, res) => {
+export const getNotifications = async (req, res) => {
     try {
         const { limit = 20, skip = 0, unreadOnly = false } = req.query;
         const userId = req.user._id;
@@ -43,7 +43,7 @@ exports.getNotifications = async (req, res) => {
 /**
  * Get unread notification count
  */
-exports.getUnreadCount = async (req, res) => {
+export const getUnreadCount = async (req, res) => {
     try {
         const userId = req.user._id;
         const count = await Notification.getUnreadCount(userId);
@@ -64,7 +64,7 @@ exports.getUnreadCount = async (req, res) => {
 /**
  * Mark notification as read
  */
-exports.markAsRead = async (req, res) => {
+export const markAsRead = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user._id;
@@ -94,7 +94,7 @@ exports.markAsRead = async (req, res) => {
 /**
  * Mark all notifications as read
  */
-exports.markAllAsRead = async (req, res) => {
+export const markAllAsRead = async (req, res) => {
     try {
         const userId = req.user._id;
         const result = await Notification.markAllAsRead(userId);
@@ -117,7 +117,7 @@ exports.markAllAsRead = async (req, res) => {
 /**
  * Delete notification
  */
-exports.deleteNotification = async (req, res) => {
+export const deleteNotification = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user._id;
@@ -146,3 +146,4 @@ exports.deleteNotification = async (req, res) => {
         });
     }
 };
+

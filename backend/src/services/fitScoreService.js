@@ -17,15 +17,19 @@ class FitScoreService {
         const weights = customWeights || FIT_SCORE_WEIGHTS[dealData.dealType];
 
         if (!weights) {
-            throw new Error('Invalid deal type');
+            // Fallback weights if deal type invalid or missing
+            return this.getEmptyScore();
         }
+
+        // Helper for safe number
+        const safeNum = (num) => Number(num) || 0;
 
         // Step 2: Normalize each metric to 0-1 scale
         const normalizedMetrics = {
-            industryMatch: this.normalizeIndustryMatch(dealData.industryMatch),
-            financials: this.normalizeFinancials(dealData.financials),
-            cultural: this.normalizeCultural(dealData.cultural),
-            technology: this.normalizeTechnology(dealData.technology)
+            industryMatch: this.normalizeIndustryMatch(dealData.industryMatch || {}),
+            financials: this.normalizeFinancials(dealData.financials || {}),
+            cultural: this.normalizeCultural(dealData.cultural || {}),
+            technology: this.normalizeTechnology(dealData.technology || {})
         };
 
         // Step 3: Calculate weighted scores
@@ -53,12 +57,15 @@ class FitScoreService {
         };
 
         // Step 4: Calculate raw fit score (0-100)
-        const rawFitScore = (
+        let rawFitScore = (
             metricBreakdown.industryMatch.weightedScore +
             metricBreakdown.financials.weightedScore +
             metricBreakdown.cultural.weightedScore +
             metricBreakdown.technology.weightedScore
         ) * 100;
+
+        // Ensure rawFitScore is a valid finite number
+        if (!Number.isFinite(rawFitScore)) rawFitScore = 0;
 
         // Step 5: Apply contextual modifiers
         const adjustmentFactors = dealData.contextualModifiers || {};
@@ -85,6 +92,20 @@ class FitScoreService {
         };
     }
 
+    getEmptyScore() {
+        return {
+            rawFitScore: 0,
+            adjustedFitScore: 0,
+            weights: {},
+            metricBreakdown: {},
+            adjustmentFactors: {},
+            categoryInterpretation: 'Unknown',
+            strengths: [],
+            risks: [],
+            recommendations: []
+        };
+    }
+
     /**
      * Normalize industry match metric (0-1)
      */
@@ -92,14 +113,18 @@ class FitScoreService {
         let score = 0.5; // Base score
 
         // Same industry bonus
-        if (industryData.targetIndustry === industryData.acquirerIndustry) {
+        if (industryData.targetIndustry && industryData.acquirerIndustry &&
+            industryData.targetIndustry === industryData.acquirerIndustry) {
             score += 0.3;
         } else if (this.isRelatedIndustry(industryData.targetIndustry, industryData.acquirerIndustry)) {
             score += 0.15;
         }
 
         // Market share alignment
-        const marketShareDiff = Math.abs(industryData.targetMarketShare - industryData.acquirerMarketShare);
+        const targetShare = Number(industryData.targetMarketShare) || 0;
+        const acquirerShare = Number(industryData.acquirerMarketShare) || 0;
+
+        const marketShareDiff = Math.abs(targetShare - acquirerShare);
         if (marketShareDiff < 10) {
             score += 0.15;
         } else if (marketShareDiff < 25) {
@@ -119,10 +144,19 @@ class FitScoreService {
      */
     normalizeFinancials(financialData) {
         let score = 0;
-        const { target, acquirer } = financialData;
+        const target = financialData.target || {};
+        const acquirer = financialData.acquirer || {};
+
+        const targetRev = Number(target.revenue) || 0;
+        const acquirerRev = Number(acquirer.revenue) || 0;
 
         // Revenue scale comparison (30% weight)
-        const revenueRatio = target.revenue / acquirer.revenue;
+        // Avoid division by zero
+        let revenueRatio = 0;
+        if (acquirerRev > 0) {
+            revenueRatio = targetRev / acquirerRev;
+        }
+
         if (revenueRatio >= 0.5 && revenueRatio <= 2.0) {
             score += 0.30;
         } else if (revenueRatio >= 0.3 && revenueRatio <= 3.0) {
@@ -132,8 +166,11 @@ class FitScoreService {
         }
 
         // EBITDA margin alignment (25% weight)
-        const targetMargin = target.revenue > 0 ? target.ebitda / target.revenue : 0;
-        const acquirerMargin = acquirer.revenue > 0 ? acquirer.ebitda / acquirer.revenue : 0;
+        const targetEbitda = Number(target.ebitda) || 0;
+        const acquirerEbitda = Number(acquirer.ebitda) || 0;
+
+        const targetMargin = targetRev > 0 ? targetEbitda / targetRev : 0;
+        const acquirerMargin = acquirerRev > 0 ? acquirerEbitda / acquirerRev : 0;
         const marginDiff = Math.abs(targetMargin - acquirerMargin);
 
         if (marginDiff < 0.05) {
@@ -145,9 +182,12 @@ class FitScoreService {
         }
 
         // Profitability (20% weight)
-        if (target.netProfit > 0 && acquirer.netProfit > 0) {
+        const targetProfit = Number(target.netProfit) || 0;
+        const acquirerProfit = Number(acquirer.netProfit) || 0;
+
+        if (targetProfit > 0 && acquirerProfit > 0) {
             score += 0.20;
-        } else if (target.netProfit > 0 || acquirer.netProfit > 0) {
+        } else if (targetProfit > 0 || acquirerProfit > 0) {
             score += 0.10;
         }
 
@@ -156,8 +196,9 @@ class FitScoreService {
         score += cashFlowScore * 0.15;
 
         // Growth rate (10% weight)
-        if (target.growthRate > 0) {
-            score += Math.min(target.growthRate / 100, 0.10);
+        const growthRate = Number(target.growthRate) || 0;
+        if (growthRate > 0) {
+            score += Math.min(growthRate / 100, 0.10);
         }
 
         return Math.min(score, 1);
@@ -170,25 +211,28 @@ class FitScoreService {
         let score = 0.3; // Base score
 
         // Key management strength (30% weight)
-        score += (culturalData.keyManagementStrength / 10) * 0.30;
+        const strength = Number(culturalData.keyManagementStrength) || 5; // Default to 5
+        score += (strength / 10) * 0.30;
 
         // Talent retention risk (30% weight)
         const retentionScore = this.getTalentRetentionScore(culturalData.talentRetentionRisk);
         score += retentionScore * 0.30;
 
         // Turnover rate (20% weight)
-        if (culturalData.turnoverRate < 10) {
+        const turnover = Number(culturalData.turnoverRate) || 0;
+        if (turnover < 10) {
             score += 0.20;
-        } else if (culturalData.turnoverRate < 20) {
+        } else if (turnover < 20) {
             score += 0.12;
-        } else if (culturalData.turnoverRate < 30) {
+        } else if (turnover < 30) {
             score += 0.06;
         }
 
         // Employee count scalability (20% weight)
-        if (culturalData.employeeCount > 0 && culturalData.employeeCount < 1000) {
+        const employees = Number(culturalData.employeeCount) || 0;
+        if (employees > 0 && employees < 1000) {
             score += 0.20;
-        } else if (culturalData.employeeCount >= 1000) {
+        } else if (employees >= 1000) {
             score += 0.10;
         }
 
@@ -202,7 +246,8 @@ class FitScoreService {
         let score = 0;
 
         // Modernization gap (40% weight)
-        score += (technologyData.modernizationGap / 10) * 0.40;
+        const gap = Number(technologyData.modernizationGap) || 5; // Default to 5
+        score += (gap / 10) * 0.40;
 
         // Legacy systems penalty (20% weight)
         if (!technologyData.legacySystems) {
@@ -236,10 +281,12 @@ class FitScoreService {
      */
     applyModifiers(rawScore, modifiers) {
         let adjustedScore = rawScore;
+        // Ensure modifiers is an object
+        if (!modifiers) return rawScore;
 
         // Market condition modifier
         if (modifiers.marketCondition) {
-            adjustedScore *= (1 + modifiers.marketCondition / 100);
+            adjustedScore *= (1 + (Number(modifiers.marketCondition) || 0) / 100);
         }
 
         // Integration timeline modifier
@@ -260,15 +307,19 @@ class FitScoreService {
             adjustedScore *= (1 + regulatoryModifier);
         }
 
-        return Math.max(0, Math.min(100, adjustedScore));
+        const finalScore = Math.max(0, Math.min(100, adjustedScore));
+        return Number.isFinite(finalScore) ? finalScore : 0;
     }
 
     /**
      * Get category interpretation for score
      */
     getCategoryInterpretation(score) {
+        // Handle undefined or invalid score
+        const safeScore = Number(score) || 0;
+
         for (const category of Object.values(FIT_SCORE_CATEGORIES)) {
-            if (score >= category.min && score <= category.max) {
+            if (safeScore >= category.min && safeScore <= category.max) {
                 return category.label;
             }
         }
@@ -353,10 +404,12 @@ class FitScoreService {
     // Helper methods
     isRelatedIndustry(industry1, industry2) {
         // Simplified - in production, would use industry classification codes
-        return industry1 && industry2 && industry1.split(' ')[0] === industry2.split(' ')[0];
+        if (!industry1 || !industry2) return false;
+        return industry1.split(' ')[0] === industry2.split(' ')[0];
     }
 
     getCashFlowScore(status) {
+        if (!status) return 0.5;
         const scores = {
             [CASH_FLOW_STATUS.STRONG_POSITIVE]: 1.0,
             [CASH_FLOW_STATUS.POSITIVE]: 0.75,
@@ -368,6 +421,7 @@ class FitScoreService {
     }
 
     getTalentRetentionScore(risk) {
+        if (!risk) return 0.5;
         const scores = {
             [TALENT_RETENTION_RISK.LOW]: 1.0,
             [TALENT_RETENTION_RISK.MODERATE]: 0.7,
@@ -378,6 +432,7 @@ class FitScoreService {
     }
 
     getTimelineModifier(timeline) {
+        if (!timeline) return 0;
         const modifiers = {
             'Fast (<6 months)': -0.15,
             'Standard (6-12 months)': 0,
@@ -387,6 +442,7 @@ class FitScoreService {
     }
 
     getCulturalModifier(sensitivity) {
+        if (!sensitivity) return 0;
         const modifiers = {
             'High sensitivity required': -0.25,
             'Standard sensitivity': 0,
@@ -396,6 +452,7 @@ class FitScoreService {
     }
 
     getRegulatoryModifier(complexity) {
+        if (!complexity) return 0;
         const modifiers = {
             'High regulatory burden': -0.20,
             'Standard regulatory': 0,
@@ -406,3 +463,4 @@ class FitScoreService {
 }
 
 export default new FitScoreService();
+

@@ -63,6 +63,13 @@ export const getPipelineAnalytics = async (req, res) => {
             }
         ]);
 
+        console.log('Analytics results:', {
+            dealsByStage: dealsByStage.length,
+            avgFitScore: avgFitScore[0]?.avgScore || 0,
+            distribution: distribution.length,
+            dealTypeDistribution: dealTypeDistribution.length
+        });
+
         res.status(200).json({
             status: 'success',
             data: {

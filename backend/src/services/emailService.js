@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 // Create transporter
 const transporter = nodemailer.createTransport({
@@ -27,7 +27,7 @@ if (process.env.ENABLE_EMAIL_NOTIFICATIONS === 'true') {
 /**
  * Send email when deal is assigned to analyst
  */
-const sendDealAssignedEmail = async (analyst, deal, manager) => {
+export const sendDealAssignedEmail = async (analyst, deal, manager) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
         to: analyst.email,
@@ -92,7 +92,7 @@ const sendDealAssignedEmail = async (analyst, deal, manager) => {
 /**
  * Send email when analysis is shared
  */
-const sendDealSharedEmail = async (recipient, deal, sharer, shareMessage) => {
+export const sendDealSharedEmail = async (recipient, deal, sharer, shareMessage) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
         to: recipient.email,
@@ -156,7 +156,7 @@ const sendDealSharedEmail = async (recipient, deal, sharer, shareMessage) => {
 /**
  * Send email when status is updated
  */
-const sendStatusUpdatedEmail = async (manager, deal, analyst, newStatus) => {
+export const sendStatusUpdatedEmail = async (manager, deal, analyst, newStatus) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
         to: manager.email,
@@ -219,7 +219,7 @@ const sendStatusUpdatedEmail = async (manager, deal, analyst, newStatus) => {
 /**
  * Send generic notification email
  */
-const sendNotificationEmail = async (recipient, title, message, ctaLink, ctaText = 'View Details') => {
+export const sendNotificationEmail = async (recipient, title, message, ctaLink, ctaText = 'View Details') => {
     const mailOptions = {
         from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
         to: recipient.email,
@@ -269,9 +269,3 @@ const sendNotificationEmail = async (recipient, title, message, ctaLink, ctaText
     }
 };
 
-module.exports = {
-    sendDealAssignedEmail,
-    sendDealSharedEmail,
-    sendStatusUpdatedEmail,
-    sendNotificationEmail
-};

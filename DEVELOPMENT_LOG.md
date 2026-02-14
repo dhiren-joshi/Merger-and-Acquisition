@@ -5,6 +5,44 @@
 
 ---
 
+## 2026-02-13 - Developer Experience Improvements
+
+### Timestamp: 22:00 IST
+
+#### Context
+To streamline the development workflow and reduce setup friction for new developers, dedicated startup scripts were created. These scripts automate environment setup, dependency installation, and server startup.
+
+#### Actions Taken
+
+##### 1. Created Utility Scripts
+- **Backend Startup Script** ([run_backend.bat](file:///c:/Users/dhire/M&A/run_backend.bat))
+  - Sets environment variables (PORT, NODE_ENV)
+  - Checks Node.js version
+  - Installs dependencies automatically
+  - Starts the Express server
+  - Includes error handling and pause on crash
+
+- **Frontend Startup Script** ([run_frontend.bat](file:///c:/Users/dhire/M&A/run_frontend.bat))
+  - Checks Node.js version
+  - Installs dependencies automatically
+  - Starts Vite development server
+  - Uses direct path to Vite binary for reliability
+
+#### Rationale
+- **Simplification**: One-click startup for both servers
+- **Reliability**: Ensures dependencies are installed before starting
+- **Environment Consistency**: Sets necessary environment variables automatically
+- **Error Visibility**: Pause on exit allows developers to read crash logs
+
+#### Outcome
+✅ **Developer Experience Improved**:
+- Reduced startup time
+- Eliminated manual command typing
+- Consistent environment configuration
+
+---
+
+
 ## 2026-02-13 - Collaboration & Security Enhancements
 
 ### Timestamp: 21:00 IST

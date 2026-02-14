@@ -1115,15 +1115,15 @@ db.deals.createIndex({ targetCompanyName: "text", dealName: "text" })
 ┌─────────────────────────────────────────────────────────────────┐
 │  Fit Score Generator - Create New Analysis                      │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  Progress Bar: ▓▓▓▓░░░░░ 57% (Step 4 of 7)                    │
-│                                                                  │
+│                                                                 │
+│  Progress Bar: ▓▓▓▓░░░░░ 57% (Step 4 of 7)                      │
+│                                                                 │
 │  ┌──────────────────────────────────────────────────────────┐   │
 │  │ Step 4: Cultural & Operational Data                      │   │
 │  ├──────────────────────────────────────────────────────────┤   │
-│  │                                                           │   │
-│  │ [Form fields for cultural metrics]                       │   │
-│  │                                                           │   │
+│  │                                                           │  │
+│  │ [Form fields for cultural metrics]                       │  │
+│  │                                                           │  │
 │  │ ┌─────────────────────────────────────────────────────┐  │   │
 │  │ │ Company Mission Statement (Optional)                │  │   │
 │  │ │ [Large textarea with character counter]             │  │   │

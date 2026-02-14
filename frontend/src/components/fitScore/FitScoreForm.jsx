@@ -178,6 +178,11 @@ export default function FitScoreForm() {
             toast.success('Deal created successfully!');
             navigate('/dashboard');
         } catch (error) {
+            console.error('Deal Creation Failed:', error);
+            if (error.response) {
+                console.error('Server Response:', error.response.data);
+                console.error('Status:', error.response.status);
+            }
             toast.error(error.response?.data?.message || 'Failed to create deal');
         } finally {
             setLoading(false);
@@ -719,10 +724,10 @@ export default function FitScoreForm() {
                         <div
                             key={index}
                             className={`text-xs font-medium ${index === currentStep
-                                    ? 'text-primary-600'
-                                    : index < currentStep
-                                        ? 'text-green-600'
-                                        : 'text-gray-400'
+                                ? 'text-primary-600'
+                                : index < currentStep
+                                    ? 'text-green-600'
+                                    : 'text-gray-400'
                                 }`}
                         >
                             {index + 1}. {step}

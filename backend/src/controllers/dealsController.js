@@ -140,9 +140,12 @@ export const getDeal = async (req, res) => {
 export const createDeal = async (req, res) => {
     try {
         const dealData = req.body;
+        console.log('Creating deal with data:', JSON.stringify(dealData, null, 2));
 
         // Calculate fit score
+        console.log('Calculating fit score...');
         const fitScoreResult = fitScoreService.calculateFitScore(dealData, dealData.customWeights);
+        console.log('Fit Score Result:', JSON.stringify(fitScoreResult, null, 2));
 
         // Create deal with fit score
         const deal = await Deal.create({
@@ -164,7 +167,17 @@ export const createDeal = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Create deal error:', error);
+        console.error('Create deal error details:', error);
+
+        // Handle Mongoose validation errors specifically
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(val => val.message);
+            return res.status(400).json({
+                status: 'error',
+                message: `Validation Error: ${messages.join(', ')}`
+            });
+        }
+
         res.status(500).json({
             status: 'error',
             message: error.message || 'Error creating deal'
