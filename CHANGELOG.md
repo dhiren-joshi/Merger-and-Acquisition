@@ -8,7 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added (Latest - 2026-02-13)
+### Added (Latest - 2026-02-16)
+- **Notification System**
+  - Real-time in-app notifications
+  - NotificationBell and Dropdown components
+  - Backend notification infrastructure (Model/Controller/Routes)
+
+- **Deal Assignments**
+  - AssignmentDropdown for deal delegation
+  - Visual assignment status badges
+  - Assignment history tracking
+
+- **Enhanced Audit & Logging**
+  - Middleware-based activity logging (`activityLogger.js`)
+  - Comprehensive `ActivityLog` model
+  - Expanded `ActivityTimeline` visualization
+
+- **Service Architecture Refactoring**
+  - Dedicated `excelExportService.js`
+  - Dedicated `comparisonExportService.js`
+  - Base `emailService.js` structure
+
+### Added (Previous - 2026-02-13)
 - **Deal Sharing System**
   - ShareModal component for email-based deal sharing
   - Permission management (View/Edit access levels)

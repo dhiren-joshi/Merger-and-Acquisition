@@ -5,9 +5,86 @@
 
 ---
 
-## 2026-02-13 - Developer Experience Improvements
+## 2026-02-16 - Major Feature Expansion: Notifications & assignments
 
-### Timestamp: 22:00 IST
+### Timestamp: 01:00 IST
+
+#### Context
+To enhance user engagement and workflow management, a robust notification system and deal assignment functionality were implemented. Additionally, the activity logging system was overhauled for better auditability, and export capabilities were refactored into dedicated services for maintainability.
+
+#### Actions Taken
+
+##### 1. Notification System
+- **Backend Infrastructure**:
+  - Created `Notification` model ([Notification.js](file:///c:/Users/dhire/M&A/backend/src/models/Notification.js))
+  - Implemented `notificationController` and routes
+  - Added real-time polling/fetching mechanism
+- **Frontend Components**:
+  - `NotificationBell`: Visual indicator with unread count
+  - `NotificationDropdown`: Interactive list of notifications
+  - `NotificationItem`: Individual notification display with actions
+
+##### 2. Deal Assignment System
+- **Assignment Logic**:
+  - Updated `Deal` model to support assignee tracking
+  - Created `AssignmentDropdown` component for quick user assignment
+  - Added `AssignmentStatusBadge` for visual status tracking
+- **Workflow Integration**:
+  - Auto-notifies users upon assignment
+  - Updates activity log when assignment changes
+
+##### 3. Enhanced Activity Logging
+- **Middleware Approach**:
+  - Implemented `activityLogger` middleware ([activityLogger.js](file:///c:/Users/dhire/M&A/backend/src/middleware/activityLogger.js)) to automatically track critical actions
+  - Created `ActivityLog` model for structured audit data
+- **Service Integration**:
+  - `activityService.js` handles complex logging scenarios
+  - Frontend `ActivityTimeline` updated to utilize new data structure
+
+##### 4. Export Service Refactoring
+- **Dedicated Services**:
+  - `excelExportService.js`: Encapsulates all Excel generation logic
+  - `comparisonExportService.js`: Specialized logic for comparison reports
+- **Email Infrastructure**:
+  - `emailService.js`: Foundation for transactional emails (invites, alerts)
+
+#### Technical Details
+
+**Files Created/Refactored**:
+- `backend/src/models/Notification.js`
+- `backend/src/controllers/notificationController.js`
+- `frontend/src/components/notifications/*` (3 components)
+- `frontend/src/components/dashboard/AssignmentDropdown.jsx`
+- `backend/src/middleware/activityLogger.js`
+- `frontend/src/services/excelExportService.js`
+
+**Notification Trigger Logic**:
+```javascript
+// Example: Creating a notification when a deal is assigned
+await Notification.create({
+  recipient: assignedUserId,
+  type: 'ASSIGNMENT',
+  content: `You have been assigned to deal: ${dealName}`,
+  relatedResource: dealId,
+  resourceModel: 'Deal'
+});
+```
+
+#### Rationale
+- **Notifications**: Users need immediate feedback on important events (assignments, mentions) without manual checking.
+- **Assignments**: Clear ownership of deals is critical for pipeline velocity.
+- **Activity Logging**: Automated middleware ensures no action is missed, providing a reliable audit trail.
+- **Service Refactoring**: Separating export logic improves code readability and reusability.
+
+#### Outcome
+✅ **System Capabilities Expanded**:
+- Real-time user awareness through notifications
+- Clear deal ownership via assignments
+- Comprehensive, automated audit trails
+- Modular and maintainable export code capabilities
+
+---
+
 
 #### Context
 To streamline the development workflow and reduce setup friction for new developers, dedicated startup scripts were created. These scripts automate environment setup, dependency installation, and server startup.

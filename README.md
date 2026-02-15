@@ -276,13 +276,12 @@ Run MongoDB first, then:
 - Ensure frontend URL is included
 
 ## Future Enhancements
-
-- Export to PDF/Excel functionality
-- Advanced analytics dashboard
-- Team collaboration features
-- AI-powered insights (GPT integration)
-- Mobile responsive improvements
-- Email notifications
+279: 
+280: - AI-powered insights (GPT integration)
+281: - Mobile responsive improvements
+282: - Advanced search/filtering with ElasticSearch
+283: - Multi-tenancy support
+284: - SSO integration
 
 ## License
 
