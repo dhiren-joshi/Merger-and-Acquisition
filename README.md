@@ -8,8 +8,14 @@ A comprehensive web-based platform for managing Merger & Acquisition workflows w
 - **Intelligent Fit Score Generator**: Weighted metric calculation (0-100) based on Industry, Financials, Culture, and Technology
 - **Drag-and-Drop Interface**: Intuitive deal card movement between pipeline stages
 - **Multi-Step Form Wizard**: Comprehensive data collection for accurate fit score calculation
-- **Real-time Analytics**: Pipeline statistics and deal distribution
-- **User Authentication**: Secure JWT-based authentication system
+- **Real-time Analytics**: Pipeline statistics, KPI cards, and deal distribution charts
+- **User Authentication**: Secure JWT-based authentication with role-based access control (RBAC)
+- **Deal Comparison**: Side-by-side comparison with radar charts and exportable reports
+- **Notification System**: Real-time in-app notifications with bell indicator and dropdown
+- **Deal Assignments**: Assign deals to team members with status badges and tracking
+- **Activity Tracking**: Automated audit trail with visual timeline for all deal actions
+- **Deal Sharing**: Email-based sharing with granular permissions (View/Edit)
+- **Export Functionality**: PDF, Excel, and JSON export for deals and comparisons
 
 ## Documentation
 
@@ -19,9 +25,12 @@ This project includes comprehensive documentation to help you understand the sys
 - **[DEVELOPMENT_LOG.md](DEVELOPMENT_LOG.md)**: Detailed log of all development activities, decisions, and changes
 - **[CHANGELOG.md](CHANGELOG.md)**: Version history and release notes
 - **[ARCHITECTURE.md](ARCHITECTURE.md)**: System architecture, design decisions, and component interactions
+- **[DEVOPS_GUIDE.md](DEVOPS_GUIDE.md)**: DevOps and deployment guide
 - **[M-A_Product_Description.md](M-A_Product_Description.md)**: Complete product specification (1445 lines)
 - **[MONGODB_SETUP.md](MONGODB_SETUP.md)**: Database configuration guide
 - **[QUICKSTART.md](QUICKSTART.md)**: Quick setup guide
+- **[QUICK_START_FRONTEND.md](QUICK_START_FRONTEND.md)**: Frontend-specific quick start
+- **[REAL_DEAL_COMPARISON.md](REAL_DEAL_COMPARISON.md)**: Real-world M&A deal validation — 8 deals compared against our Fit Score algorithm
 - **[.agent/workflows/documentation.md](.agent/workflows/documentation.md)**: How to maintain project documentation
 
 
@@ -29,20 +38,31 @@ This project includes comprehensive documentation to help you understand the sys
 
 ### Backend
 - **Node.js** + **Express.js**: RESTful API server
-- **MongoDB**: Database with Mongoose ODM
-- **JWT**: Authentication and authorization
-- **bcryptjs**: Password hashing
+- **MongoDB** + **Mongoose**: Database and ODM
+- **JWT** + **bcryptjs**: Authentication and password hashing
+- **Helmet**: HTTP security headers
+- **Compression**: Response compression
+- **Morgan**: HTTP request logging
+- **Multer**: File upload handling
+- **Nodemailer**: Email service
+- **express-validator**: Input validation
+- **Lodash**: Utility functions
 
 ### Frontend
 - **React 18**: UI framework
 - **Vite**: Build tool and dev server
 - **Tailwind CSS**: Styling framework
-- **React Router**: Client-side routing
+- **React Router v6**: Client-side routing
 - **@hello-pangea/dnd**: Drag-and-drop functionality
-- **Recharts**: Data visualization
-- **React Hook Form**: Form management
+- **Recharts**: Data visualization and charts
+- **React Hook Form** + **Zod**: Form management and validation
+- **Zustand**: Lightweight state management
+- **@tanstack/react-query**: Server state and data fetching
 - **Axios**: HTTP client
-- **React Toastify**: Notifications
+- **jspdf** + **xlsx**: PDF and Excel export
+- **lucide-react**: Modern icon library
+- **date-fns**: Date utility functions
+- **React Toastify**: Toast notifications
 
 ## Project Structure
 
@@ -50,33 +70,69 @@ This project includes comprehensive documentation to help you understand the sys
 M&A/
 ├── backend/
 │   ├── src/
-│   │   ├── config/         # Database configuration
-│   │   ├── controllers/    # Request handlers
-│   │   ├── models/         # MongoDB models
-│   │   ├── routes/         # API routes
-│   │   ├── services/       # Business logic (Fit Score)
-│   │   ├── middleware/     # Auth & error handling
-│   │   ├── utils/          # Constants and helpers
-│   │   ├── app.js          # Express app setup
-│   │   └── server.js       # Entry point
-│   ├── .env                # Environment variables
+│   │   ├── config/            # Database configuration
+│   │   ├── controllers/       # Request handlers
+│   │   │   ├── authController.js
+│   │   │   ├── dealsController.js
+│   │   │   ├── analyticsController.js
+│   │   │   ├── sharingController.js
+│   │   │   ├── notificationController.js
+│   │   │   ├── activityController.js
+│   │   │   └── usersController.js
+│   │   ├── models/            # MongoDB models
+│   │   │   ├── User.js
+│   │   │   ├── Deal.js
+│   │   │   ├── Notification.js
+│   │   │   ├── ActivityLog.js
+│   │   │   └── SharedAnalysis.js
+│   │   ├── routes/            # API routes
+│   │   │   ├── auth.js
+│   │   │   ├── deals.js
+│   │   │   ├── analytics.js
+│   │   │   ├── sharing.js
+│   │   │   ├── notifications.js
+│   │   │   ├── activity.js
+│   │   │   └── users.js
+│   │   ├── services/          # Business logic
+│   │   │   ├── fitScoreService.js
+│   │   │   └── emailService.js
+│   │   ├── middleware/        # Auth, logging & error handling
+│   │   │   ├── auth.js
+│   │   │   ├── roleAuth.js
+│   │   │   ├── activityLogger.js
+│   │   │   └── errorHandler.js
+│   │   ├── utils/             # Constants and helpers
+│   │   ├── app.js             # Express app setup
+│   │   └── server.js          # Entry point
+│   ├── .env                   # Environment variables
 │   └── package.json
 │
-└── frontend/
-    ├── src/
-    │   ├── components/     # React components
-    │   │   ├── common/     # Shared components
-    │   │   ├── dashboard/  # Kanban & DealCard
-    │   │   └── fitScore/   # Fit Score form
-    │   ├── pages/          # Page components
-    │   ├── services/       # API services
-    │   ├── utils/          # Utilities & constants
-    │   ├── styles/         # Global CSS
-    │   ├── App.jsx         # Main app component
-    │   └── main.jsx        # Entry point
-    ├── index.html
-    ├── vite.config.js
-    └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── common/        # Header, Sidebar, PrivateRoute, LoadingSpinner
+│   │   │   ├── dashboard/     # KanbanBoard, DealCard, Assignment*
+│   │   │   ├── fitScore/      # FitScoreForm (multi-step wizard)
+│   │   │   ├── visualizations/# CircularGauge, MetricBarChart, InsightsCard
+│   │   │   ├── comparison/    # ComparisonRadarChart, ComparisonTable
+│   │   │   ├── collaboration/ # NotesSection
+│   │   │   ├── notifications/ # NotificationBell, Dropdown, Item
+│   │   │   ├── sharing/       # ShareModal
+│   │   │   └── activity/      # ActivityTimeline
+│   │   ├── pages/             # Dashboard, Analytics, DealDetails, etc.
+│   │   ├── services/          # API services (9 service modules)
+│   │   ├── utils/             # Constants and helpers
+│   │   ├── styles/            # Global CSS
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── index.html
+│   └── package.json
+│
+├── run_backend.bat            # One-click backend starter
+├── run_frontend.bat           # One-click frontend starter
+├── start_servers.bat          # Start both servers
+├── REAL_DEAL_COMPARISON.md     # Real-world deal validation dataset
+└── Documentation (11 .md files)
 ```
 
 ## Prerequisites
@@ -206,9 +262,27 @@ The Fit Score is calculated using weighted metrics based on deal type:
 - `DELETE /api/deals/:dealId` - Delete deal
 - `PATCH /api/deals/:dealId/stage` - Update deal stage
 - `POST /api/deals/:dealId/notes` - Add note to deal
+- `DELETE /api/deals/:dealId/notes/:noteId` - Delete a note
 
 ### Analytics
 - `GET /api/analytics/pipeline` - Get pipeline statistics
+
+### Notifications
+- `GET /api/notifications` - Get user notifications
+- `PATCH /api/notifications/:id/read` - Mark notification as read
+- `DELETE /api/notifications/:id` - Delete notification
+
+### Sharing
+- `POST /api/sharing` - Share a deal/analysis
+- `GET /api/sharing` - Get shared items
+- `DELETE /api/sharing/:id` - Revoke sharing access
+
+### Users
+- `GET /api/users` - Get all users (for assignments)
+
+### Activity
+- `GET /api/activity` - Get activity logs
+- `GET /api/activity/:dealId` - Get deal-specific activity
 
 ## Environment Variables
 

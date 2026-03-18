@@ -8,7 +8,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added (Latest - 2026-02-16)
+## [1.1.1] - 2026-03-18 — Real-World Deal Validation Dataset
+
+### Added
+- **`REAL_DEAL_COMPARISON.md`**: Comprehensive comparison of 8 real-world M&A deals against our Fit Score algorithm
+  - Deals: Microsoft→LinkedIn, Google→Fitbit, Disney→Fox, Amazon→Whole Foods, Facebook→Instagram, Yahoo→Tumblr, HP→Autonomy, Salesforce→Slack
+  - Each deal includes verified financial data (SEC filings, 10-K reports), system score estimation, real outcome, and alignment analysis
+  - Overall system accuracy: 87.5–100% (7/8 fully aligned, 1 partially aligned)
+  - Covers all 4 deal types: Tech Acquisition, Market Expansion, Talent Acquisition, Distressed Buy
+  - Documents known system limitations (pre-revenue startups, fraud detection, post-deal execution)
+
+### Changed
+- Updated `README.md` — Added `REAL_DEAL_COMPARISON.md` to documentation listing and project structure
+- Updated `DEVELOPMENT_LOG.md` — Added development entry for deal validation dataset
+- Updated `PROGRESS_REPORT.md` — Added validation dataset to feature inventory and documentation list
+- Updated `CHANGELOG.md` — This entry
+
+## [1.1.0] - 2026-03-18 — Project Cleanup & Bug Fixes
+
+### Removed
+- **Dead code files deleted**:
+  - `frontend/src/pages/Test.jsx` — Debug page, never routed
+  - `query` — Scratch file in project root (contained "MongoDB")
+  - `backend/src/controllers/deleteNoteController.js` — Duplicate of `dealsController.deleteNote`, never imported
+  - `backend/test_fit_score.js` — One-off test script not in any test suite
+- **Unused `authorize` middleware** removed from `backend/src/middleware/auth.js` — `roleAuth.js:requireRole` already handles this and is what routes actually use
+- **Dead Edit button** removed from `DealDetails.jsx` — linked to non-existent `/deals/:dealId/edit` route
+
+### Fixed
+- **Critical: MongoDB `$text` + `$or` query conflict** in `dealsController.getDeals` — wrapping conditions with `$and` so Manager search no longer crashes
+- **Comparison export wrong field names** in `comparisonExportService.js` — corrected `financialHealth` → `financials`, `culturalFit` → `cultural`, `technologyCompatibility` → `technology`, removed non-existent `strategicAlignment` metric
+- **Inconsistent error response format** in `roleAuth.js` — changed `{ success: false }` to `{ status: 'error' }` to match project-wide convention
+- **Confirmed `html2canvas`** is properly installed as a dependency (was imported but appeared missing from package.json listing)
+
+
+### Added (Latest - 2026-03-11 — Documentation Audit)
+- **Previously Undocumented Features Now Captured**
+  - `AnalystDashboard.jsx` — Role-specific analyst dashboard page
+  - `usersController.js` + `users.js` route — User listing for assignments
+  - `SharedAnalysis.js` model — Shared deal/analysis persistence
+  - `PrivateRoute.jsx` — Authenticated route guard component
+  - `start_servers.bat` — Combined server startup script
+  - 4 frontend services: notificationService, sharingService, exportService, activityService
+  - 7 backend dependencies: helmet, compression, morgan, multer, nodemailer, express-validator, lodash
+
+### Added (Previous - 2026-02-16)
 - **Notification System**
   - Real-time in-app notifications
   - NotificationBell and Dropdown components

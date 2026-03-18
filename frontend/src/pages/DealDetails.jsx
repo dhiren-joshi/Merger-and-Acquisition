@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ArrowLeft, Download, Share2, Edit, History } from 'lucide-react';
+import { ArrowLeft, Download, Trash2, History } from 'lucide-react';
 import Header from '../components/common/Header';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import CircularGauge from '../components/visualizations/CircularGauge';
@@ -9,9 +9,9 @@ import MetricBarChart from '../components/visualizations/MetricBarChart';
 import WeightDistributionChart from '../components/visualizations/WeightDistributionChart';
 import InsightsCard from '../components/visualizations/InsightsCard';
 import NotesSection from '../components/collaboration/NotesSection';
-import ShareModal from '../components/sharing/ShareModal';
 import ActivityTimeline from '../components/activity/ActivityTimeline';
 import dealService from '../services/dealService';
+import authService from '../services/authService';
 import { exportToPDF, exportToJSON } from '../services/exportService';
 import { exportToExcel } from '../services/excelExportService';
 import { formatCurrency, formatDate } from '../utils/formatters';
@@ -21,8 +21,8 @@ export default function DealDetails() {
     const navigate = useNavigate();
     const [deal, setDeal] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [shareModalOpen, setShareModalOpen] = useState(false);
     const [showActivity, setShowActivity] = useState(false);
+    const isManager = authService.isManager();
 
     useEffect(() => {
         fetchDeal();
@@ -69,8 +69,20 @@ export default function DealDetails() {
         }
     };
 
-    const handleShare = () => {
-        setShareModalOpen(true);
+    const handleDelete = async () => {
+        const confirmed = window.confirm(
+            `Are you sure you want to delete the deal "${deal.targetCompanyName}"? This action cannot be undone.`
+        );
+        if (!confirmed) return;
+
+        try {
+            await dealService.deleteDeal(dealId);
+            toast.success('Deal deleted successfully');
+            navigate('/dashboard');
+        } catch (error) {
+            console.error('Delete deal error:', error);
+            toast.error(error.response?.data?.message || 'Failed to delete deal');
+        }
     };
 
     if (loading) {
@@ -136,20 +148,15 @@ export default function DealDetails() {
                                 <Download className="w-4 h-4" />
                                 <span>JSON</span>
                             </button>
-                            <button
-                                onClick={handleShare}
-                                className="btn-secondary flex items-center space-x-2"
-                            >
-                                <Share2 className="w-4 h-4" />
-                                <span>Share</span>
-                            </button>
-                            <button
-                                onClick={() => navigate(`/deals/${dealId}/edit`)}
-                                className="btn-primary flex items-center space-x-2"
-                            >
-                                <Edit className="w-4 h-4" />
-                                <span>Edit</span>
-                            </button>
+                            {isManager && (
+                                <button
+                                    onClick={handleDelete}
+                                    className="btn-secondary flex items-center space-x-2 text-red-600 hover:text-red-700 hover:border-red-300"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                    <span>Delete</span>
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -375,12 +382,6 @@ export default function DealDetails() {
                 </div>
             </main>
 
-            {/* Share Modal */}
-            <ShareModal
-                deal={deal}
-                isOpen={shareModalOpen}
-                onClose={() => setShareModalOpen(false)}
-            />
         </div>
     );
 }

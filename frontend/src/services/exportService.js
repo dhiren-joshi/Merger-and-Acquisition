@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 import { formatCurrency, formatDate, formatPercentage } from '../utils/formatters';
 import { getFitScoreCategory } from '../utils/constants';
@@ -96,7 +96,7 @@ export const exportToPDF = async (deal) => {
             ['Last Updated', formatDate(deal.updatedAt)]
         ];
 
-        doc.autoTable({
+        autoTable(doc, {
             startY: yPos,
             body: dealInfo,
             theme: 'plain',
@@ -129,35 +129,29 @@ export const exportToPDF = async (deal) => {
                     'Industry Match',
                     Math.round((metrics.industryMatch?.input || 0) * 100),
                     `${Math.round((metrics.industryMatch?.weight || 0) * 100)}%`,
-                    Math.round(metrics.industryMatch?.weightedScore || 0)
+                    Math.round((metrics.industryMatch?.weightedScore || 0) * 100)
                 ],
                 [
                     'Financial Health',
-                    Math.round((metrics.financialHealth?.input || 0) * 100),
-                    `${Math.round((metrics.financialHealth?.weight || 0) * 100)}%`,
-                    Math.round(metrics.financialHealth?.weightedScore || 0)
+                    Math.round((metrics.financials?.input || 0) * 100),
+                    `${Math.round((metrics.financials?.weight || 0) * 100)}%`,
+                    Math.round((metrics.financials?.weightedScore || 0) * 100)
                 ],
                 [
                     'Cultural Fit',
-                    Math.round((metrics.culturalFit?.input || 0) * 100),
-                    `${Math.round((metrics.culturalFit?.weight || 0) * 100)}%`,
-                    Math.round(metrics.culturalFit?.weightedScore || 0)
+                    Math.round((metrics.cultural?.input || 0) * 100),
+                    `${Math.round((metrics.cultural?.weight || 0) * 100)}%`,
+                    Math.round((metrics.cultural?.weightedScore || 0) * 100)
                 ],
                 [
                     'Technology Compatibility',
-                    Math.round((metrics.technologyCompatibility?.input || 0) * 100),
-                    `${Math.round((metrics.technologyCompatibility?.weight || 0) * 100)}%`,
-                    Math.round(metrics.technologyCompatibility?.weightedScore || 0)
-                ],
-                [
-                    'Strategic Alignment',
-                    Math.round((metrics.strategicAlignment?.input || 0) * 100),
-                    `${Math.round((metrics.strategicAlignment?.weight || 0) * 100)}%`,
-                    Math.round(metrics.strategicAlignment?.weightedScore || 0)
+                    Math.round((metrics.technology?.input || 0) * 100),
+                    `${Math.round((metrics.technology?.weight || 0) * 100)}%`,
+                    Math.round((metrics.technology?.weightedScore || 0) * 100)
                 ]
             ];
 
-            doc.autoTable({
+            autoTable(doc, {
                 startY: yPos,
                 head: [metricData[0]],
                 body: metricData.slice(1),
@@ -312,9 +306,17 @@ export const exportToPDF = async (deal) => {
             );
         }
 
-        // Save the PDF
+        // Save the PDF using explicit blob download for reliable MIME type
         const fileName = `${deal.targetCompanyName.replace(/\s+/g, '_')}_FitScore_${new Date().getTime()}.pdf`;
-        doc.save(fileName);
+        const pdfBlob = doc.output('blob');
+        const blobUrl = URL.createObjectURL(new Blob([pdfBlob], { type: 'application/pdf' }));
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
 
         return true;
     } catch (error) {

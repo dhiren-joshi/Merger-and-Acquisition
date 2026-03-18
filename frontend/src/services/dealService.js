@@ -53,6 +53,30 @@ const dealService = {
     },
 
     /**
+     * Assign deal to an analyst (Manager only)
+     */
+    assignDeal: async (dealId, analystId) => {
+        const response = await api.post(`/deals/${dealId}/assign`, { analystId });
+        return response.data;
+    },
+
+    /**
+     * Reassign deal to another analyst (Manager only)
+     */
+    reassignDeal: async (dealId, analystId) => {
+        const response = await api.patch(`/deals/${dealId}/reassign`, { analystId });
+        return response.data;
+    },
+
+    /**
+     * Update assignment status (Analyst can update their own)
+     */
+    updateAssignmentStatus: async (dealId, status) => {
+        const response = await api.patch(`/deals/${dealId}/assignment-status`, { status });
+        return response.data;
+    },
+
+    /**
      * Add note to deal
      */
     addNote: async (dealId, content) => {

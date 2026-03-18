@@ -20,37 +20,48 @@ export const getDeals = async (req, res) => {
             offset = 0
         } = req.query;
 
-        // Build query based on user role
-        let query = {};
+        // Build filter conditions as an array for $and
+        const conditions = [];
 
+        // Role-based access filter
         if (req.user.role === 'Manager') {
             // Managers see all deals they created or assigned
-            query.$or = [
-                { createdBy: req.userId },
-                { assignedBy: req.userId }
-            ];
+            conditions.push({
+                $or: [
+                    { createdBy: req.userId },
+                    { assignedBy: req.userId }
+                ]
+            });
         } else if (req.user.role === 'Analyst') {
             // Analysts only see deals assigned to them
-            query.assignedTo = req.userId;
+            conditions.push({ assignedTo: req.userId });
         }
 
         if (stage) {
-            query.currentStage = stage;
+            conditions.push({ currentStage: stage });
         }
 
         if (dealType) {
-            query.dealType = dealType;
+            conditions.push({ dealType });
         }
 
         if (fitScoreMin || fitScoreMax) {
-            query['fitScore.adjustedFitScore'] = {};
-            if (fitScoreMin) query['fitScore.adjustedFitScore'].$gte = Number(fitScoreMin);
-            if (fitScoreMax) query['fitScore.adjustedFitScore'].$lte = Number(fitScoreMax);
+            const scoreFilter = {};
+            if (fitScoreMin) scoreFilter.$gte = Number(fitScoreMin);
+            if (fitScoreMax) scoreFilter.$lte = Number(fitScoreMax);
+            conditions.push({ 'fitScore.adjustedFitScore': scoreFilter });
         }
 
         if (search) {
-            query.$text = { $search: search };
+            conditions.push({ $text: { $search: search } });
         }
+
+        // Build final query — use $and only if multiple conditions exist
+        const query = conditions.length > 1
+            ? { $and: conditions }
+            : conditions.length === 1
+                ? conditions[0]
+                : {};
 
         // Execute query
         const deals = await Deal.find(query)
@@ -102,9 +113,10 @@ export const getDeal = async (req, res) => {
 
         // Check access: Manager (owner or assigner) or Analyst (assignee)
         const isManager = req.user.role === 'Manager';
-        const isOwner = deal.createdBy._id.toString() === req.userId;
-        const isAssigner = deal.assignedBy?.toString() === req.userId;
-        const isAssignee = deal.assignedTo?.toString() === req.userId;
+        // After populate(), fields are objects with _id, not plain ObjectIds
+        const isOwner = deal.createdBy?._id?.toString() === req.userId;
+        const isAssigner = deal.assignedBy?._id?.toString() === req.userId;
+        const isAssignee = deal.assignedTo?._id?.toString() === req.userId;
 
         if (!isManager && !isAssignee) {
             return res.status(403).json({
@@ -585,7 +597,7 @@ export const updateAssignmentStatus = async (req, res) => {
         await deal.save();
 
         const populatedDeal = await Deal.findById(deal._id)
-            .populate('assigned To', 'firstName lastName email role')
+            .populate('assignedTo', 'firstName lastName email role')
             .populate('assignedBy', 'firstName lastName email role')
             .populate('createdBy', 'firstName lastName email role');
 

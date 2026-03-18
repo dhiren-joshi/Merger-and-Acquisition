@@ -10,7 +10,7 @@ export const requireRole = (...allowedRoles) => {
         // Check if user is authenticated (auth middleware should run first)
         if (!req.user) {
             return res.status(401).json({
-                success: false,
+                status: 'error',
                 message: 'Authentication required'
             });
         }
@@ -21,9 +21,8 @@ export const requireRole = (...allowedRoles) => {
         // Check if user's role is in allowed roles
         if (!roles.includes(req.user.role)) {
             return res.status(403).json({
-                success: false,
-                message: `Access denied. Required role: ${roles.join(' or ')}`,
-                userRole: req.user.role
+                status: 'error',
+                message: `Access denied. Required role: ${roles.join(' or ')}`
             });
         }
 

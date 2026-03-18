@@ -7,18 +7,33 @@ import mongoose from 'mongoose';
  */
 export const getPipelineAnalytics = async (req, res) => {
     try {
-        console.log('Analytics request - User ID:', req.userId);
+        console.log('Analytics request - User ID:', req.userId, 'Role:', req.user.role);
 
         // Convert userId to ObjectId for MongoDB aggregate queries
         const userId = new mongoose.Types.ObjectId(req.userId);
 
+        // Build role-based match filter (same logic as getDeals)
+        let matchFilter = {};
+        if (req.user.role === 'Manager') {
+            // Managers see deals they created or assigned
+            matchFilter = {
+                $or: [
+                    { createdBy: userId },
+                    { assignedBy: userId }
+                ]
+            };
+        } else if (req.user.role === 'Analyst') {
+            // Analysts only see deals assigned to them
+            matchFilter = { assignedTo: userId };
+        }
+
         // Get total deals for this user (debug)
-        const totalDeals = await Deal.countDocuments({ createdBy: userId });
+        const totalDeals = await Deal.countDocuments(matchFilter);
         console.log('Total deals for user:', totalDeals);
 
         // Get deals by stage
         const dealsByStage = await Deal.aggregate([
-            { $match: { createdBy: userId } },
+            { $match: matchFilter },
             {
                 $group: {
                     _id: '$currentStage',
@@ -30,7 +45,7 @@ export const getPipelineAnalytics = async (req, res) => {
 
         // Get overall average fit score
         const avgFitScore = await Deal.aggregate([
-            { $match: { createdBy: userId } },
+            { $match: matchFilter },
             {
                 $group: {
                     _id: null,
@@ -41,7 +56,7 @@ export const getPipelineAnalytics = async (req, res) => {
 
         // Get fit score distribution
         const distribution = await Deal.aggregate([
-            { $match: { createdBy: userId } },
+            { $match: matchFilter },
             {
                 $bucket: {
                     groupBy: '$fitScore.adjustedFitScore',
@@ -54,7 +69,7 @@ export const getPipelineAnalytics = async (req, res) => {
 
         // Get deal type distribution
         const dealTypeDistribution = await Deal.aggregate([
-            { $match: { createdBy: userId } },
+            { $match: matchFilter },
             {
                 $group: {
                     _id: '$dealType',
