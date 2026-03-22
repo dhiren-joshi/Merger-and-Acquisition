@@ -145,10 +145,6 @@ M&A/
 
 ### 1. Clone the Repository
 
-```bash
-cd c:\Users\dhire\M&A
-```
-
 ### 2. Backend Setup
 
 ```bash
