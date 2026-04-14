@@ -11,9 +11,10 @@ connectDB();
 // Get port from environment
 const PORT = process.env.PORT || 5000;
 
-// Start server
-const server = app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+// Start server — bind to 0.0.0.0 for cloud deployment (Render, Railway, etc.)
+const HOST = process.env.HOST || '0.0.0.0';
+const server = app.listen(PORT, HOST, () => {
+    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on ${HOST}:${PORT}`);
 });
 
 // Handle unhandled promise rejections

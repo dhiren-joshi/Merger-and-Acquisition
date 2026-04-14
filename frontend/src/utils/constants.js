@@ -103,5 +103,5 @@ export const getFitScoreCategory = (score) => {
     return 'Poor Fit';
 };
 
-// API Base URL
-export const API_BASE_URL = '/api';
+// API Base URL — uses VITE_API_URL env var in production, falls back to '/api' for dev proxy
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
