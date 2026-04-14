@@ -12,9 +12,9 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | Dimension | What It Measures |
 |---|---|
 | **Industry Match** | Same/related industry, market share alignment, strategic motive |
-| **Financials** | Revenue ratio, EBITDA margins, profitability, cash flow, growth rate |
-| **Cultural** | Management strength, talent retention risk, turnover, employee scale |
-| **Technology** | Modernization gap, legacy systems, infrastructure type, security certs, tech stack |
+| **Financials** | Revenue ratio, EBITDA margins, profitability, debt levels, cash flow, growth rate |
+| **Cultural** | Org structure, management style, avg compensation, management strength, talent retention risk, turnover, employee scale |
+| **Technology** | Modernization gap, legacy systems, infrastructure type, databases, dev methodology, security certs, tech stack |
 
 **Weights by Deal Type:**
 
@@ -55,8 +55,12 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Acquirer EBITDA** | $30,000M | FY2016 estimated EBITDA |
 | **Target Net Profit** | -$166M (GAAP loss) | LinkedIn reported GAAP net loss |
 | **Acquirer Net Profit** | $16,800M | Microsoft FY2016 net income |
+| **Target Debt** | $1,500M | LinkedIn had ~$1.5B in convertible notes outstanding (SEC 10-K 2015) |
 | **Cash Flow Status** | Positive | LinkedIn had positive operating cash flow |
 | **Growth Rate** | 35% | LinkedIn's YoY revenue growth |
+| **Organizational Structure** | Flat | LinkedIn operated with flat engineering-driven structure |
+| **Management Style** | Collaborative | Jeff Weiner's compassionate management philosophy |
+| **Average Compensation** | $160,000 | Glassdoor avg for LinkedIn engineers (2016) |
 | **Key Management Strength** | 8/10 | Jeff Weiner was highly respected CEO |
 | **Talent Retention Risk** | Low | LinkedIn maintained independence, Weiner reported to Nadella |
 | **Turnover Rate** | ~12% | Tech industry average |
@@ -64,6 +68,8 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Modernization Gap** | 8/10 | Both highly modern tech stacks |
 | **Legacy Systems** | No | Cloud-native platform |
 | **Infrastructure Type** | Cloud | LinkedIn operated on cloud infrastructure |
+| **Databases** | Oracle, Espresso (NoSQL), Voldemort | LinkedIn engineering blog; custom-built data stores |
+| **Development Methodology** | Agile | Agile/CI-CD practices; 3x daily deployments |
 | **Security Certifications** | SOC 2, ISO 27001 | Enterprise-grade security |
 | **Primary Technologies** | Java, Python, Hadoop, Kafka, Rest APIs | LinkedIn engineering blog |
 
@@ -119,8 +125,12 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Acquirer EBITDA** | $55,000M | Estimated EBITDA |
 | **Target Net Profit** | -$186M | Net loss |
 | **Acquirer Net Profit** | $40,269M | Alphabet net income FY2020 |
+| **Target Debt** | $43M | Fitbit had minimal debt; ~$43M in operating lease obligations (10-K 2019) |
 | **Cash Flow Status** | Negative | Fitbit was burning cash |
 | **Growth Rate** | -6% | Revenue declining YoY |
+| **Organizational Structure** | Hierarchical | Traditional hardware company structure with divisions |
+| **Management Style** | Directive | Top-down product decisions; founders controlled direction |
+| **Average Compensation** | $130,000 | Glassdoor average for Fitbit engineers (2020) |
 | **Key Management Strength** | 6/10 | Co-founders James Park & Eric Friedman, but company struggling |
 | **Talent Retention Risk** | High | Co-founders left by 2024; significant layoffs |
 | **Turnover Rate** | ~18% | Higher than average, company in decline |
@@ -128,6 +138,8 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Modernization Gap** | 6/10 | Hardware-focused, needed Google's AI/cloud |
 | **Legacy Systems** | Yes | Proprietary Fitbit OS, older sensor tech |
 | **Infrastructure Type** | Hybrid | Mix of on-premise and cloud |
+| **Databases** | PostgreSQL, Firebase | IoT data backends; health metrics storage |
+| **Development Methodology** | Agile | Hardware sprints with software agile cycles |
 | **Security Certifications** | HIPAA (health data) | Health-specific compliance |
 | **Primary Technologies** | Embedded C, Bluetooth, Fitbit OS, iOS/Android SDKs | Fitbit developer docs |
 
@@ -184,8 +196,12 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Acquirer EBITDA** | $15,700M | Disney FY2018 estimated EBITDA |
 | **Target Net Profit** | $4,500M (est.) | Fox segments combined |
 | **Acquirer Net Profit** | $12,600M | Disney FY2018 net income |
+| **Target Debt** | $19,200M | Disney assumed ~$19.2B of Fox's debt as part of the deal (SEC filing) |
 | **Cash Flow Status** | Strong positive | Fox had strong content cash flows |
 | **Growth Rate** | 8% | Moderate growth in content revenues |
+| **Organizational Structure** | Matrix | Large studio with cross-functional divisions (film, TV, sports) |
+| **Management Style** | Directive | Murdoch family top-down leadership |
+| **Average Compensation** | $95,000 | Entertainment industry average for Fox employees |
 | **Key Management Strength** | 7/10 | Strong studio leadership (Fox Searchlight, FX) |
 | **Talent Retention Risk** | Moderate | Creative talent needs careful handling; 3,000–10,000 layoffs occurred |
 | **Turnover Rate** | ~15% | Industry standard for entertainment |
@@ -193,6 +209,8 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Modernization Gap** | 5/10 | Traditional studio + emerging streaming |
 | **Legacy Systems** | Yes | Legacy broadcast infrastructure |
 | **Infrastructure Type** | Hybrid | Mix of physical studios and cloud services |
+| **Databases** | Oracle, SAP HANA | Enterprise content and financial management |
+| **Development Methodology** | Waterfall | Traditional media production with linear project management |
 | **Security Certifications** | Standard media security | DRM, content security |
 | **Primary Technologies** | Content management, broadcast tech, streaming | — |
 
@@ -250,8 +268,12 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Acquirer EBITDA** | $12,500M | Amazon FY2016 est. EBITDA |
 | **Target Net Profit** | $507M | FY2016 net income |
 | **Acquirer Net Profit** | $2,371M | Amazon FY2016 net income |
+| **Target Debt** | $1,000M | Whole Foods had ~$1B in long-term debt and lease obligations (10-K 2016) |
 | **Cash Flow Status** | Positive | Whole Foods had stable cash flows |
 | **Growth Rate** | -2.5% | Revenue had been declining |
+| **Organizational Structure** | Hierarchical | Regional structure with store-level management hierarchy |
+| **Management Style** | Collaborative | John Mackey's "Conscious Capitalism" philosophy |
+| **Average Compensation** | $38,000 | Retail average for Whole Foods (higher than industry avg) |
 | **Key Management Strength** | 7/10 | John Mackey (co-founder) remained as CEO |
 | **Talent Retention Risk** | Moderate | Benefits changes post-acquisition caused some friction |
 | **Turnover Rate** | ~25% | Typical for retail industry |
@@ -259,6 +281,8 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Modernization Gap** | 4/10 | Traditional retail tech, needed modernization |
 | **Legacy Systems** | Yes | Legacy POS and supply chain systems |
 | **Infrastructure Type** | On-Premise | Physical stores with legacy IT |
+| **Databases** | Oracle, AS/400 | Legacy retail databases and inventory management |
+| **Development Methodology** | Waterfall | Traditional retail IT with slow release cycles |
 | **Security Certifications** | PCI-DSS | Payment card compliance |
 | **Primary Technologies** | POS systems, supply chain mgmt, basic e-commerce | — |
 
@@ -316,8 +340,12 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Acquirer EBITDA** | $1,500M (est.) | Facebook pre-IPO estimates |
 | **Target Net Profit** | -$5M (est.) | Pre-revenue |
 | **Acquirer Net Profit** | $1,000M | Facebook FY2011 net income |
+| **Target Debt** | $0 | Instagram had zero debt; funded by $57.5M in venture capital (Benchmark, a16z) |
 | **Cash Flow Status** | Negative | Pre-revenue startup |
 | **Growth Rate** | N/A (pre-revenue, user growth 400%+) | Explosive user growth |
+| **Organizational Structure** | Flat | 13-person startup with no hierarchy |
+| **Management Style** | Collaborative | Systrom & Krieger co-led with open decision-making |
+| **Average Compensation** | $120,000 | SF startup engineer salary estimate (2012) |
 | **Key Management Strength** | 9/10 | Kevin Systrom & Mike Krieger — visionary founders |
 | **Talent Retention Risk** | Moderate | Small team heavily key-person dependent |
 | **Turnover Rate** | ~5% | Startup with committed team |
@@ -325,6 +353,8 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Modernization Gap** | 9/10 | Cutting-edge mobile-first architecture |
 | **Legacy Systems** | No | Pure mobile-native, no legacy |
 | **Infrastructure Type** | Cloud | AWS-based cloud infrastructure |
+| **Databases** | PostgreSQL, Redis, Cassandra | Instagram engineering blog; high-scale data stores |
+| **Development Methodology** | Agile | Rapid iteration with weekly releases |
 | **Security Certifications** | None formal (startup) | — |
 | **Primary Technologies** | Python, Django, iOS, Android, PostgreSQL, Redis, AWS | Instagram engineering blog |
 
@@ -381,8 +411,12 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Acquirer EBITDA** | $800M (est.) | Yahoo's declining profitability |
 | **Target Net Profit** | -$25M | Net loss |
 | **Acquirer Net Profit** | $3,900M (boosted by Alibaba stake) | Not from operations |
+| **Target Debt** | $0 | Tumblr was debt-free; funded by ~$125M in venture capital (Sequoia, Spark) |
 | **Cash Flow Status** | Strong negative | Burning more than earning |
 | **Growth Rate** | 100%+ (but from tiny base of $13M) | $13M revenue, growing but unsustainable |
+| **Organizational Structure** | Flat | Startup culture with minimal hierarchy |
+| **Management Style** | Laissez-faire | Karp gave engineers creative freedom; resisted structure |
+| **Average Compensation** | $110,000 | NYC startup engineer salary estimate (2013) |
 | **Key Management Strength** | 5/10 | David Karp — creative visionary but averse to monetization |
 | **Talent Retention Risk** | High | Culture clash with Yahoo's corporate environment |
 | **Turnover Rate** | ~20% | Startup environment with uncertainty |
@@ -390,6 +424,8 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Modernization Gap** | 7/10 | Modern web platform |
 | **Legacy Systems** | No | Modern web stack |
 | **Infrastructure Type** | Cloud | Cloud-hosted platform |
+| **Databases** | MySQL, Redis, HBase | Tumblr engineering blog; high-volume data stores |
+| **Development Methodology** | Agile | Rapid feature iteration with continuous deployment |
 | **Security Certifications** | None formal | — |
 | **Primary Technologies** | PHP, JavaScript, Tumblr API, Redis | — |
 
@@ -446,8 +482,12 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Acquirer EBITDA** | $13,000M (est.) | HP enterprise EBITDA |
 | **Target Net Profit** | $300M (claimed) | Inflated figures |
 | **Acquirer Net Profit** | $7,074M | HP FY2011 net income |
+| **Target Debt** | $350M | Autonomy had ~£220M (~$350M) in debt and deferred liabilities (annual report 2010) |
 | **Cash Flow Status** | Positive (claimed) | Represented as strong by Autonomy |
 | **Growth Rate** | 55% CAGR (claimed) | Autonomy's reported 5-year growth rate |
+| **Organizational Structure** | Hierarchical | UK corporate structure with layered management |
+| **Management Style** | Autocratic | Mike Lynch controlled all major decisions; centralized power |
+| **Average Compensation** | $90,000 | UK enterprise software average (Cambridge-based) |
 | **Key Management Strength** | 6/10 | Mike Lynch — charismatic but controversial CEO |
 | **Talent Retention Risk** | High | Employees fled after acquisition; integration was bungled |
 | **Turnover Rate** | ~25% (post-acquisition) | Massive post-deal exits |
@@ -455,6 +495,8 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Modernization Gap** | 7/10 | Autonomy's IDOL search tech was sophisticated |
 | **Legacy Systems** | No | Modern enterprise search platform |
 | **Infrastructure Type** | On-Premise | Enterprise on-premise software |
+| **Databases** | IDOL (proprietary), Oracle | Autonomy used its own IDOL database engine |
+| **Development Methodology** | Waterfall | Traditional enterprise software development cycles |
 | **Security Certifications** | Government-grade certs | Defense/intelligence customers |
 | **Primary Technologies** | IDOL search, Bayesian analytics, C++, Java | — |
 
@@ -514,8 +556,12 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Acquirer EBITDA** | $3,500M (est.) | Salesforce estimated EBITDA |
 | **Target Net Profit** | -$292M | Net loss FY2021 |
 | **Acquirer Net Profit** | $4,072M | Salesforce FY2021 net income |
+| **Target Debt** | $750M | Slack had $750M in convertible notes outstanding (SEC 10-K 2021) |
 | **Cash Flow Status** | Neutral | Slack was cash-flow breakeven with heavy investment |
 | **Growth Rate** | 43% | YoY revenue growth (accelerated by COVID) |
+| **Organizational Structure** | Flat | Engineering-driven culture with autonomous teams |
+| **Management Style** | Collaborative | Butterfield fostered open, inclusive team culture |
+| **Average Compensation** | $175,000 | Glassdoor average for Slack engineers (2021) |
 | **Key Management Strength** | 8/10 | Stewart Butterfield — well-known founder, staying as CEO |
 | **Talent Retention Risk** | Low | Butterfield stayed; Slack operated with independence |
 | **Turnover Rate** | ~10% | SaaS industry average |
@@ -523,6 +569,8 @@ Our Fit Score evaluates 4 dimensions (0–100 scale):
 | **Modernization Gap** | 9/10 | Highly modern real-time messaging platform |
 | **Legacy Systems** | No | Cloud-native, modern microservices |
 | **Infrastructure Type** | Cloud | AWS-based cloud infrastructure |
+| **Databases** | MySQL, Vitess, Redis, Solr | Slack engineering blog; sharded MySQL via Vitess |
+| **Development Methodology** | Agile | CI/CD with daily deployments and feature flags |
 | **Security Certifications** | SOC 2, ISO 27001, FedRAMP (GovSlack) | Enterprise + government security |
 | **Primary Technologies** | PHP, Java, React, Electron, AWS, WebSockets | Slack engineering blog |
 
